@@ -427,6 +427,65 @@ body {
   display: flex; gap: 6px; margin: 12px 16px 0; justify-content: center;
 }
 .mc-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* ===== VOCAB LIST ===== */
+.vocab-list-section { margin-bottom: 18px; }
+.vocab-list-cat-title {
+  font-size: 13px; font-weight: 900; color: var(--mga-green);
+  background: var(--mga-light); padding: 6px 12px; border-radius: 8px;
+  margin: 14px 0 6px; letter-spacing: 0.5px;
+}
+.vocab-list-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 7px 10px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.vocab-list-row:first-of-type { border-radius: 10px 10px 0 0; }
+.vocab-list-row:last-of-type { border-radius: 0 0 10px 10px; border-bottom: none; }
+.vocab-list-en { font-size: 15px; font-weight: 800; color: var(--text); min-width: 110px; }
+.vocab-list-ja { font-size: 13px; color: var(--text-mid); }
+.vocab-list-count { font-size: 12px; color: var(--text-dim); margin: 8px 0 2px; font-weight: 700; }
+
+/* ===== QUIZ DIFFICULTY ===== */
+.diff-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 20px 0; }
+.diff-card {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: 18px 16px;
+  cursor: pointer; text-align: left; transition: all 0.18s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.diff-card:hover { border-color: var(--mga-green); background: var(--mga-light); }
+.diff-card-title { font-size: 18px; font-weight: 900; }
+.diff-card-cats { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.diff-card-xp { font-size: 12px; font-weight: 700; margin-top: 4px; }
+.diff-card.lv1 { border-color: #86efac; }
+.diff-card.lv1 .diff-card-title { color: var(--mga-green); }
+.diff-card.lv2 { border-color: #93c5fd; }
+.diff-card.lv2 .diff-card-title { color: var(--mga-blue); }
+.diff-card.lv3 { border-color: #fca5a5; }
+.diff-card.lv3 .diff-card-title { color: var(--mga-red); }
+
+/* quiz 問題文日本語補助 */
+.quiz-q-hint { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-style: italic; text-align: center; }
+
+/* リセット確認オーバーレイ */
+#overlay-reset {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1200; padding: 24px;
+}
+#overlay-reset.show { display: flex; }
+.reset-dialog {
+  background: #fff; border-radius: 20px; padding: 28px 22px;
+  max-width: 340px; width: 100%; text-align: center;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+}
+.reset-dialog h3 { font-size: 18px; font-weight: 900; color: var(--mga-red); margin-bottom: 10px; }
+.reset-dialog p { font-size: 13px; color: var(--text-mid); line-height: 1.6; margin-bottom: 20px; }
+.reset-btn-row { display: flex; gap: 10px; }
+.reset-cancel { flex: 1; padding: 12px; border: 2px solid var(--border); background: #fff; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; color: var(--text); }
+.reset-confirm { flex: 1; padding: 12px; border: none; background: var(--mga-red); border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; color: #fff; }
+.reset-btn { margin-top: 16px; background: #fff; border: 2px solid var(--mga-red); color: var(--mga-red); padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; }
 </style>
 </head>
 <body>
@@ -486,11 +545,17 @@ body {
         <span class="menu-card-label">単語カード</span>
         <span class="menu-card-sub">+5 XP / 問</span>
       </button>
-      <button class="menu-card" onclick="startQuiz()">
+      <button class="menu-card" onclick="showVocabList()">
+        <div class="menu-card-top-bar bar-green"></div>
+        <span class="menu-card-icon">📋</span>
+        <span class="menu-card-label">単語一覧</span>
+        <span class="menu-card-sub">全単語を確認</span>
+      </button>
+      <button class="menu-card" onclick="showQuizDiff()">
         <div class="menu-card-top-bar bar-blue"></div>
         <span class="menu-card-icon">🎯</span>
         <span class="menu-card-label">文法クイズ</span>
-        <span class="menu-card-sub">+10 XP / 問</span>
+        <span class="menu-card-sub">+10〜15 XP / 問</span>
       </button>
       <button class="menu-card menu-card-wide" onclick="showAlbum()" id="album-menu-btn">
         <div class="menu-card-top-bar bar-yellow"></div>
@@ -542,6 +607,52 @@ body {
   </div>
 </div>
 
+<!-- ===== VOCAB LIST ===== -->
+<div id="screen-vocab-list" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="page-title">📋 単語一覧</span>
+  </div>
+  <div class="screen-body">
+    <div class="vocab-list-count" id="vlist-count"></div>
+    <div id="vocab-list-body"></div>
+  </div>
+</div>
+
+<!-- ===== QUIZ DIFFICULTY ===== -->
+<div id="screen-quiz-diff" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="page-title">🎯 文法クイズ</span>
+  </div>
+  <div class="screen-body">
+    <div style="font-size:15px;font-weight:800;margin:8px 0 4px;color:var(--text)">難易度を選んでね</div>
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:4px;">最初は「やさしい」からチャレンジしよう！</div>
+    <div class="diff-grid">
+      <button class="diff-card lv1" onclick="startQuiz(1)">
+        <span class="diff-card-title">⭐ やさしい</span>
+        <span class="diff-card-cats">be動詞 / 一般動詞 / This・That / There is・are</span>
+        <span class="diff-card-xp">正解 +10 XP</span>
+      </button>
+      <button class="diff-card lv2" onclick="startQuiz(2)">
+        <span class="diff-card-title">⭐⭐ ふつう</span>
+        <span class="diff-card-cats">疑問文 / 否定文 / 複数形 / can / 代名詞 / 疑問詞 / 命令文</span>
+        <span class="diff-card-xp">正解 +12 XP</span>
+      </button>
+      <button class="diff-card lv3" onclick="startQuiz(3)">
+        <span class="diff-card-title">⭐⭐⭐ むずかしい</span>
+        <span class="diff-card-cats">三単現 / 現在進行形 / 前置詞 / 形容詞 / 数・量 / 会話</span>
+        <span class="diff-card-xp">正解 +15 XP</span>
+      </button>
+      <button class="diff-card" style="border-color:var(--mga-yellow)" onclick="startQuiz(0)">
+        <span class="diff-card-title" style="color:var(--mga-yellow)">🎲 全レベルランダム</span>
+        <span class="diff-card-cats">すべてのカテゴリからランダム出題</span>
+        <span class="diff-card-xp">正解 +10〜15 XP</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== QUIZ ===== -->
 <div id="screen-quiz" class="screen">
   <div class="page-header">
@@ -557,6 +668,7 @@ body {
       <span class="quiz-cat-badge" id="quiz-cat">be動詞</span>
     </div>
     <div class="quiz-q" id="quiz-q"></div>
+    <div class="quiz-q-hint" id="quiz-q-hint"></div>
     <div class="quiz-choices" id="quiz-choices"></div>
     <div class="quiz-exp" id="quiz-exp"></div>
     <button class="quiz-next" id="quiz-next" onclick="nextQ()">次の問題 →</button>
@@ -690,7 +802,28 @@ body {
       </div>
     </div>
 
+    <div class="help-section">
+      <h3>🔄 データリセット</h3>
+      <div class="help-row">
+        <span class="help-icon">⚠️</span>
+        <div>経験値・ランク・ジャケットコレクションをすべて初期化します。この操作は取り消せません。</div>
+      </div>
+      <button class="reset-btn" onclick="showResetConfirm()">🗑️ データをリセットする</button>
+    </div>
+
     <button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>
+  </div>
+</div>
+
+<!-- ===== RESET CONFIRM ===== -->
+<div id="overlay-reset">
+  <div class="reset-dialog">
+    <h3>⚠️ 本当にリセット？</h3>
+    <p>経験値・ランク・ジャケット写真の進捗が<strong>すべて消えます</strong>。<br>この操作は取り消しできません。</p>
+    <div class="reset-btn-row">
+      <button class="reset-cancel" onclick="closeResetConfirm()">キャンセル</button>
+      <button class="reset-confirm" onclick="doReset()">リセットする</button>
+    </div>
   </div>
 </div>
 
@@ -1256,11 +1389,51 @@ function finishVocab() {
 // ============================================================
 // QUIZ
 // ============================================================
+const QUIZ_LV = {
+  1: ['be動詞','一般動詞','this/that','there is/are'],
+  2: ['疑問文','否定文','複数形','can','代名詞','疑問詞','命令文'],
+  3: ['三単現','現在進行形','前置詞','形容詞','数・量','会話'],
+};
+// 問題文の日本語ヒント（catと問題の一部から自動生成）
+function makeHint(q) {
+  const hints = {
+    'be動詞':'（　）に am / is / are のどれかを入れよう',
+    '一般動詞':'（　）に動詞の原形を入れよう',
+    '疑問文':'疑問文に合う語を選ぼう',
+    '否定文':'否定の形を選ぼう',
+    '複数形':'複数形（～s / ～es）の正しい形を選ぼう',
+    'can':'can を使った文を完成させよう',
+    '三単現':'三人称単数現在形を選ぼう（he/she/it）',
+    '代名詞':'（）内の日本語に合う代名詞を選ぼう',
+    '疑問詞':'（）内の意味に合う疑問詞を選ぼう',
+    '命令文':'命令文の正しい形を選ぼう',
+    'this/that':'this/that/these/those から選ぼう',
+    'there is/are':'There is / There are の正しい形を選ぼう',
+    '現在進行形':'今やっている動作を表す形（be動詞＋ing）を選ぼう',
+    '前置詞':'場所・時間に合う前置詞を選ぼう',
+    '形容詞':'形容詞の正しい使い方を選ぼう',
+    '数・量':'How much / How many などから選ぼう',
+    '会話':'会話のつながりに合う返事を選ぼう',
+  };
+  return hints[q.cat] || '';
+}
+
 let qc = {};
 
-function startQuiz() {
-  const qs = [...QUIZZES].sort(() => Math.random()-0.5).slice(0, 10);
-  qc = { qs, idx:0, ok:0, ng:0, xp:0, answered:false };
+function showQuizDiff() { show('screen-quiz-diff'); }
+
+function startQuiz(lv) {
+  let pool;
+  if (lv === 0) {
+    pool = [...QUIZZES];
+  } else {
+    const cats = QUIZ_LV[lv] || [];
+    pool = QUIZZES.filter(q => cats.includes(q.cat));
+    if (pool.length === 0) pool = [...QUIZZES];
+  }
+  const xpPer = lv === 3 ? 15 : lv === 2 ? 12 : 10;
+  const qs = pool.sort(() => Math.random()-0.5).slice(0, 10);
+  qc = { qs, idx:0, ok:0, ng:0, xp:0, xpPer, answered:false };
   document.getElementById('quiz-xp').textContent = '+0 XP';
   show('screen-quiz');
   loadQ();
@@ -1273,6 +1446,7 @@ function loadQ() {
   document.getElementById('quiz-bar').style.width = ((n-1)/t*100) + '%';
   document.getElementById('quiz-cat').textContent = q.cat;
   document.getElementById('quiz-q').textContent = q.q;
+  document.getElementById('quiz-q-hint').textContent = makeHint(q);
   const ch = document.getElementById('quiz-choices');
   ch.innerHTML = '';
   q.c.forEach((c, i) => {
@@ -1289,7 +1463,7 @@ function answerQ(i) {
   if (qc.answered) return;
   qc.answered = true;
   const q = qc.qs[qc.idx], ok = i===q.a;
-  qc.xp += ok ? 10 : 2;
+  qc.xp += ok ? qc.xpPer : 2;
   if (ok) qc.ok++; else qc.ng++;
   document.getElementById('quiz-xp').textContent = '+' + qc.xp + ' XP';
   document.querySelectorAll('.quiz-choice').forEach((b, j) => {
@@ -1417,6 +1591,43 @@ function confetti() {
     c.appendChild(p);
   }
   setTimeout(() => { c.innerHTML = ''; }, 3500);
+}
+
+// ============================================================
+// VOCAB LIST
+// ============================================================
+function showVocabList() {
+  const cats = [...new Set(VOCAB.map(v => v.cat))];
+  const body = document.getElementById('vocab-list-body');
+  body.innerHTML = '';
+  cats.forEach(cat => {
+    const words = VOCAB.filter(v => v.cat === cat);
+    const titleEl = document.createElement('div');
+    titleEl.className = 'vocab-list-cat-title';
+    titleEl.textContent = cat + '（' + words.length + '語）';
+    body.appendChild(titleEl);
+    words.forEach(w => {
+      const row = document.createElement('div');
+      row.className = 'vocab-list-row';
+      row.innerHTML = `<span class="vocab-list-en">${w.en}</span><span class="vocab-list-ja">${w.ja}</span>`;
+      body.appendChild(row);
+    });
+  });
+  document.getElementById('vlist-count').textContent = '全 ' + VOCAB.length + ' 語';
+  show('screen-vocab-list');
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function showResetConfirm() { document.getElementById('overlay-reset').classList.add('show'); }
+function closeResetConfirm() { document.getElementById('overlay-reset').classList.remove('show'); }
+function doReset() {
+  S = { xp:0, rank:0, unlockedPhotos:[0], revealedPhotos:[], streak:0, lastDate:'' };
+  saveS();
+  closeResetConfirm();
+  updateHome();
+  goHome();
 }
 
 // ============================================================
