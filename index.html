@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>英語クエスト 🎸</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  /* Mrs. GREEN APPLE カラーパレット */
+  --mga-green:  #16a34a;
+  --mga-green2: #22c55e;
+  --mga-light:  #dcfce7;
+  --mga-red:    #ef4444;   /* 大森元貴 */
+  --mga-blue:   #3b82f6;   /* 若井滉斗 */
+  --mga-yellow: #f59e0b;   /* 藤澤涼架 */
+  --mga-mint:   #f0fdf4;   /* 背景 */
+
+  --bg:       #f0fdf4;
+  --surface:  #ffffff;
+  --surface2: #f8fffe;
+  --border:   #d1fae5;
+  --shadow:   rgba(22,163,74,0.10);
+
+  --text:     #14532d;
+  --text-mid: #166534;
+  --text-dim: #6b7280;
+  --radius:   16px;
+}
+body {
+  font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ===== SCREENS ===== */
+.screen { display: none; flex-direction: column; min-height: 100vh; padding: 0 0 40px; max-width: 480px; margin: 0 auto; }
+.screen.active { display: flex; }
+.screen-body { padding: 0 16px; }
+
+/* ===== GRADIENT HEADER ===== */
+.app-header {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 60%, #4ade80 100%);
+  padding: 20px 16px 28px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.app-header::before {
+  content: '';
+  position: absolute; top: -40%; right: -20%;
+  width: 240px; height: 240px;
+  background: rgba(255,255,255,0.10);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.app-header::after {
+  content: '';
+  position: absolute; bottom: -30%; left: -10%;
+  width: 160px; height: 160px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; position: relative; z-index: 1; }
+.header-title-text { font-size: 20px; font-weight: 900; letter-spacing: 0.5px; color: #fff; }
+.header-date { font-size: 12px; color: rgba(255,255,255,0.8); }
+.help-btn {
+  background: rgba(255,255,255,0.22); border: none; color: #fff;
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 16px; font-weight: 900; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== RANK CARD (in header) ===== */
+.rank-inline { position: relative; z-index: 1; }
+.rank-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.rank-icon-sm { font-size: 30px; }
+.rank-info { flex: 1; }
+.rank-label-sm { font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.rank-name-sm { font-size: 20px; font-weight: 900; color: #fff; }
+.rank-total-xp { font-size: 12px; color: rgba(255,255,255,0.85); font-weight: 600; }
+.xp-bar-wrap { background: rgba(255,255,255,0.25); border-radius: 999px; height: 10px; overflow: hidden; margin-bottom: 4px; }
+.xp-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, #fff 0%, #fef08a 100%);
+  transition: width 0.9s cubic-bezier(0.34,1.56,0.64,1);
+  min-width: 6px;
+}
+.xp-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.8); }
+
+/* ===== PAGE HEADER (sub screens) ===== */
+.page-header {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 80%);
+  padding: 16px; display: flex; align-items: center; gap: 12px; color: #fff;
+  margin-bottom: 16px;
+}
+.back-btn {
+  background: rgba(255,255,255,0.2); border: none; color: #fff;
+  width: 38px; height: 38px; border-radius: 12px;
+  font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.page-title { font-size: 18px; font-weight: 800; color: #fff; }
+.spacer { flex: 1; }
+.page-xp { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 700; }
+
+/* ===== STREAK ===== */
+.streak-row {
+  margin: -14px 16px 14px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 2px 12px var(--shadow);
+  border: 1px solid var(--border);
+  position: relative; z-index: 2;
+}
+.streak-fire { font-size: 28px; }
+.streak-num { font-size: 22px; font-weight: 900; color: var(--mga-yellow); }
+.streak-label { font-size: 13px; font-weight: 700; color: var(--text); }
+.streak-sub { font-size: 11px; color: var(--text-dim); }
+
+/* ===== MENU ===== */
+.menu-section { padding: 0 16px; }
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.menu-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px 14px 16px;
+  text-align: center; cursor: pointer;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: transform 0.12s, box-shadow 0.12s;
+  position: relative; overflow: hidden;
+}
+.menu-card:active { transform: scale(0.95); box-shadow: none; }
+.menu-card-top-bar { height: 4px; position: absolute; top: 0; left: 0; right: 0; border-radius: 4px 4px 0 0; }
+.menu-card-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+.menu-card-label { font-size: 15px; font-weight: 800; color: var(--text); display: block; }
+.menu-card-sub { font-size: 11px; color: var(--text-dim); display: block; margin-top: 3px; }
+.menu-card-wide { grid-column: 1 / -1; }
+.new-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--mga-red); color: #fff;
+  font-size: 10px; font-weight: 800;
+  padding: 2px 7px; border-radius: 999px;
+}
+
+/* ===== MEMBER COLOR BARS ===== */
+.bar-green  { background: linear-gradient(90deg, var(--mga-green), var(--mga-green2)); }
+.bar-red    { background: linear-gradient(90deg, #f87171, var(--mga-red)); }
+.bar-blue   { background: linear-gradient(90deg, #60a5fa, var(--mga-blue)); }
+.bar-yellow { background: linear-gradient(90deg, #fcd34d, var(--mga-yellow)); }
+
+/* ===== VOCAB ===== */
+.session-bar {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 10px 14px; display: flex; justify-content: space-between;
+  font-size: 13px; margin-bottom: 14px; align-items: center;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.cat-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cat-chip {
+  flex-shrink: 0; padding: 6px 14px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer;
+  color: var(--text-dim); transition: all 0.15s;
+}
+.cat-chip.active { background: var(--mga-green); border-color: var(--mga-green); color: #fff; }
+
+.vocab-card { height: 220px; cursor: pointer; margin-bottom: 14px; perspective: 1000px; }
+.vocab-inner {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+  border-radius: 24px;
+}
+.vocab-card.flipped .vocab-inner { transform: rotateY(180deg); }
+.vocab-front, .vocab-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 24px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px;
+}
+.vocab-front {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  box-shadow: 0 4px 20px var(--shadow);
+}
+.vocab-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff;
+}
+.vocab-en { font-size: 34px; font-weight: 900; text-align: center; color: var(--text); }
+.vocab-ja { font-size: 30px; font-weight: 900; color: #fff; text-align: center; }
+.vocab-en-sub { font-size: 18px; color: rgba(255,255,255,0.7); margin-top: 8px; }
+.vocab-cat-tag {
+  font-size: 11px; font-weight: 700;
+  background: var(--mga-light); color: var(--mga-green);
+  padding: 2px 10px; border-radius: 999px; margin-top: 8px;
+}
+.vocab-cat-tag-inv {
+  font-size: 11px; font-weight: 700;
+  background: rgba(255,255,255,0.2); color: #fff;
+  padding: 2px 10px; border-radius: 999px; margin-top: 8px;
+}
+.vocab-tap { font-size: 12px; color: var(--text-dim); margin-top: 12px; }
+
+.answer-btns { display: flex; gap: 12px; margin-bottom: 12px; }
+.answer-btn {
+  flex: 1; padding: 15px; border-radius: var(--radius);
+  border: 2px solid; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: transform 0.1s;
+}
+.answer-btn:active { transform: scale(0.95); }
+.btn-wrong  { background: #fef2f2; color: var(--mga-red); border-color: #fca5a5; }
+.btn-correct { background: #f0fdf4; color: var(--mga-green); border-color: #86efac; }
+
+.finish-btn {
+  width: 100%; padding: 13px;
+  background: transparent; border: 1.5px solid var(--border);
+  border-radius: var(--radius); color: var(--text-dim);
+  font-size: 13px; cursor: pointer;
+}
+
+/* ===== QUIZ ===== */
+.quiz-meta { text-align: center; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+.quiz-progress { background: var(--mga-light); border-radius: 999px; height: 6px; margin-bottom: 16px; overflow: hidden; }
+.quiz-progress-fill { height: 100%; background: var(--mga-green); border-radius: 999px; transition: width 0.3s; }
+.quiz-cat-badge {
+  display: inline-block; background: var(--mga-light);
+  color: var(--mga-green); font-size: 12px; font-weight: 800;
+  padding: 4px 14px; border-radius: 999px; margin-bottom: 10px;
+}
+.quiz-q {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 22px; font-size: 22px; font-weight: 800; color: var(--text);
+  text-align: center; margin-bottom: 16px; line-height: 1.4;
+  border: 2px solid var(--border);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.quiz-choices { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.quiz-choice {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: 15px 18px;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  color: var(--text); text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.quiz-choice:active:not([disabled]) { background: var(--mga-light); }
+.quiz-choice.correct { border-color: var(--mga-green); background: #f0fdf4; color: var(--mga-green); }
+.quiz-choice.wrong   { border-color: var(--mga-red); background: #fef2f2; color: var(--mga-red); }
+.quiz-choice.show-correct { border-color: var(--mga-green); background: #f0fdf4; }
+.quiz-exp {
+  border-radius: var(--radius); padding: 12px 14px;
+  font-size: 13px; margin-bottom: 10px; display: none; line-height: 1.6;
+  font-weight: 600;
+}
+.quiz-exp.show { display: block; }
+.quiz-exp.ok { background: #f0fdf4; color: #15803d; border: 1.5px solid #86efac; }
+.quiz-exp.ng { background: #fef2f2; color: #b91c1c; border: 1.5px solid #fca5a5; }
+.quiz-next {
+  width: 100%; padding: 16px; background: var(--mga-green); color: #fff;
+  border: none; border-radius: var(--radius); font-size: 16px; font-weight: 800;
+  cursor: pointer; display: none;
+  box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+}
+.quiz-next.show { display: block; }
+
+/* ===== RESULT ===== */
+.result-card {
+  background: var(--surface); border-radius: 24px;
+  padding: 32px 24px; text-align: center; margin-bottom: 16px;
+  border: 2px solid var(--border);
+  box-shadow: 0 4px 20px var(--shadow);
+}
+.result-icon { font-size: 64px; margin-bottom: 12px; }
+.result-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+.result-score { font-size: 52px; font-weight: 900; color: var(--mga-green); margin-bottom: 4px; }
+.result-xp { font-size: 16px; color: var(--mga-yellow); font-weight: 800; margin-bottom: 16px; }
+.result-breakdown { border-top: 2px solid var(--border); padding-top: 14px; text-align: left; }
+.result-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+.result-row strong { color: var(--mga-green); font-weight: 800; }
+.home-btn {
+  width: 100%; padding: 16px; background: var(--mga-green); color: #fff;
+  border: none; border-radius: var(--radius); font-size: 16px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+}
+
+/* ===== ALBUM ===== */
+.album-info {
+  font-size: 13px; color: var(--text-dim); text-align: center;
+  margin-bottom: 16px; font-weight: 600;
+}
+.album-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 24px; }
+.jacket-wrap { display: flex; flex-direction: column; gap: 4px; }
+.jacket-card { aspect-ratio: 1; border-radius: var(--radius); perspective: 800px; }
+.jacket-inner {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.34,1.56,0.64,1);
+  border-radius: var(--radius);
+}
+.jacket-card.flipped .jacket-inner { transform: rotateY(180deg); }
+.jacket-front, .jacket-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: var(--radius); overflow: hidden;
+}
+.jacket-back { transform: rotateY(180deg); }
+.jacket-back img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.jacket-front.locked {
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+}
+.jacket-front.unlocked {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border: 2px solid var(--mga-green2);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+@keyframes glow-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+  50%      { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+}
+.lock-icon { font-size: 26px; opacity: 0.3; }
+.lock-text { font-size: 10px; color: var(--text-dim); text-align: center; padding: 0 8px; font-weight: 600; }
+.unlock-icon { font-size: 38px; }
+.unlock-hint { font-size: 11px; color: var(--mga-green); font-weight: 800; }
+.jacket-title { font-size: 11px; color: var(--text-dim); text-align: center; font-weight: 600; }
+.jacket-card.revealed { cursor: pointer; }
+
+/* ===== HELP SCREEN ===== */
+.help-section {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 18px; margin-bottom: 14px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.help-section h3 {
+  font-size: 14px; font-weight: 800; color: var(--mga-green);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.help-row { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.5; }
+.help-row:last-child { border-bottom: none; }
+.help-icon { font-size: 20px; flex-shrink: 0; }
+.rank-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.rank-item {
+  background: var(--mga-light); border-radius: 10px;
+  padding: 8px 10px; font-size: 12px; font-weight: 700; color: var(--mga-green);
+  display: flex; align-items: center; gap: 6px;
+}
+.schedule-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.schedule-table th { background: var(--mga-green); color: #fff; padding: 6px 8px; text-align: left; }
+.schedule-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.schedule-table tr:last-child td { border-bottom: none; }
+
+/* ===== LEVEL UP ===== */
+#overlay-levelup {
+  position: fixed; inset: 0;
+  background: rgba(240,253,244,0.95);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 1000; padding: 32px 24px; text-align: center;
+}
+#overlay-levelup.show { display: flex; }
+.lu-icon { font-size: 80px; animation: pop-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes pop-in { from { transform: scale(0); opacity: 0; } }
+.lu-title { font-size: 36px; font-weight: 900; color: var(--mga-green); margin: 10px 0 4px; letter-spacing: 2px; }
+.lu-rank { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+.lu-msg { font-size: 14px; color: var(--text-dim); margin-bottom: 28px; line-height: 1.7; }
+.lu-btn {
+  width: 100%; max-width: 320px; padding: 16px;
+  border: none; border-radius: var(--radius);
+  font-size: 16px; font-weight: 800; cursor: pointer;
+  margin-bottom: 10px;
+}
+.lu-btn-main { background: var(--mga-green); color: #fff; box-shadow: 0 4px 12px rgba(22,163,74,0.35); }
+.lu-btn-skip { background: var(--surface); color: var(--text-dim); border: 2px solid var(--border); }
+
+/* ===== XP POPUP ===== */
+.xp-popup {
+  position: fixed; pointer-events: none;
+  font-size: 18px; font-weight: 900; color: var(--mga-green);
+  animation: xp-float 1.1s ease forwards; z-index: 900;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+@keyframes xp-float {
+  0%   { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-70px); opacity: 0; }
+}
+
+/* ===== CONFETTI ===== */
+.confetti-c { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 999; }
+.cp { position: absolute; width: 8px; height: 8px; top: -12px; border-radius: 2px; animation: cp-fall linear forwards; }
+@keyframes cp-fall { to { transform: translateY(110vh) rotate(900deg); opacity: 0; } }
+
+/* ===== PHOTO FULLSCREEN ===== */
+#overlay-photo {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1100; flex-direction: column; gap: 16px; padding: 24px;
+}
+#overlay-photo.show { display: flex; }
+#overlay-photo img { max-width: 100%; max-height: 75vh; object-fit: contain; border-radius: 12px; }
+#overlay-photo-title { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 700; }
+.photo-close { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 12px 28px; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer; }
+
+/* ===== MEMBER COLOR ACCENT SECTION ===== */
+.member-colors {
+  display: flex; gap: 6px; margin: 12px 16px 0; justify-content: center;
+}
+.mc-dot { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- ===== HOME ===== -->
+<div id="screen-home" class="screen active">
+
+  <div class="app-header">
+    <div class="header-row">
+      <span class="header-title-text">🎸 英語クエスト</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="header-date" id="home-date"></span>
+        <button class="help-btn" onclick="showHelp()">？</button>
+      </div>
+    </div>
+    <div class="rank-inline">
+      <div class="rank-top">
+        <span class="rank-icon-sm" id="home-icon">🎸</span>
+        <div class="rank-info">
+          <div class="rank-label-sm">現在のランク</div>
+          <div class="rank-name-sm" id="home-rank">路上ライブ</div>
+        </div>
+        <span class="rank-total-xp" id="home-total">累計 0 XP</span>
+      </div>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="home-bar" style="width:0%"></div></div>
+      <div class="xp-bar-labels">
+        <span id="home-xp-cur">0 XP</span>
+        <span id="home-xp-nxt">次: 80 XP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- メンバーカラードット -->
+  <div class="member-colors">
+    <div class="mc-dot" style="background:var(--mga-red)" title="大森元貴"></div>
+    <div class="mc-dot" style="background:var(--mga-green)" title="バンドカラー"></div>
+    <div class="mc-dot" style="background:var(--mga-blue)" title="若井滉斗"></div>
+    <div class="mc-dot" style="background:var(--mga-yellow)" title="藤澤涼架"></div>
+  </div>
+
+  <!-- 連続学習バッジ -->
+  <div class="streak-row">
+    <span class="streak-fire">🔥</span>
+    <div style="flex:1">
+      <div><span class="streak-num" id="home-streak">0</span><span style="font-size:14px;font-weight:800;color:var(--text);margin-left:4px;">日連続！</span></div>
+      <div class="streak-sub">毎日続けてボーナス +20 XP</div>
+    </div>
+    <span id="home-album-status" style="font-size:12px;color:var(--text-dim);font-weight:700;">0/10枚</span>
+  </div>
+
+  <!-- メニュー -->
+  <div class="menu-section">
+    <div class="menu-grid">
+      <button class="menu-card" onclick="startVocab('すべて')">
+        <div class="menu-card-top-bar bar-red"></div>
+        <span class="menu-card-icon">📖</span>
+        <span class="menu-card-label">単語カード</span>
+        <span class="menu-card-sub">+5 XP / 問</span>
+      </button>
+      <button class="menu-card" onclick="startQuiz()">
+        <div class="menu-card-top-bar bar-blue"></div>
+        <span class="menu-card-icon">🎯</span>
+        <span class="menu-card-label">文法クイズ</span>
+        <span class="menu-card-sub">+10 XP / 問</span>
+      </button>
+      <button class="menu-card menu-card-wide" onclick="showAlbum()" id="album-menu-btn">
+        <div class="menu-card-top-bar bar-yellow"></div>
+        <span class="menu-card-icon">🎵</span>
+        <span class="menu-card-label">ジャケットアルバム</span>
+        <span class="menu-card-sub" id="home-album-sub">0 / 10 枚解放中</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VOCAB ===== -->
+<div id="screen-vocab" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="page-title">📖 単語カード</span>
+    <div class="spacer"></div>
+    <span class="page-xp" id="vocab-xp">+0 XP</span>
+  </div>
+  <div class="screen-body">
+    <div class="cat-scroll" id="vocab-cats"></div>
+    <div class="session-bar">
+      <span style="color:var(--text-dim);">カテゴリ: <strong id="vocab-cat-label" style="color:var(--text)">ランダム</strong></span>
+      <span>正解 <strong id="vocab-ok" style="color:var(--mga-green);font-weight:900">0</strong> / <span id="vocab-total">0</span></span>
+    </div>
+    <div class="vocab-card" id="vocab-card" onclick="flipCard()">
+      <div class="vocab-inner" id="vocab-inner">
+        <div class="vocab-front">
+          <div class="vocab-en" id="vocab-en"></div>
+          <div class="vocab-cat-tag" id="vocab-cat"></div>
+          <div class="vocab-tap">👆 タップで日本語を見る</div>
+        </div>
+        <div class="vocab-back">
+          <div class="vocab-ja" id="vocab-ja"></div>
+          <div class="vocab-en-sub" id="vocab-en2"></div>
+          <div class="vocab-cat-tag-inv" id="vocab-cat2"></div>
+        </div>
+      </div>
+    </div>
+    <div class="answer-btns" id="vocab-btns" style="display:none;">
+      <button class="answer-btn btn-wrong" onclick="vocabAnswer(false)">✗ わからなかった</button>
+      <button class="answer-btn btn-correct" onclick="vocabAnswer(true)">✓ わかった！</button>
+    </div>
+    <button class="finish-btn" onclick="finishVocab()">終了して結果を見る →</button>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="screen-quiz" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="page-title">🎯 文法クイズ</span>
+    <div class="spacer"></div>
+    <span class="page-xp" id="quiz-xp">+0 XP</span>
+  </div>
+  <div class="screen-body">
+    <div class="quiz-meta" id="quiz-meta">問題 1 / 10</div>
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-bar" style="width:0%"></div></div>
+    <div style="text-align:center;margin-bottom:10px;">
+      <span class="quiz-cat-badge" id="quiz-cat">be動詞</span>
+    </div>
+    <div class="quiz-q" id="quiz-q"></div>
+    <div class="quiz-choices" id="quiz-choices"></div>
+    <div class="quiz-exp" id="quiz-exp"></div>
+    <button class="quiz-next" id="quiz-next" onclick="nextQ()">次の問題 →</button>
+  </div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div id="screen-result" class="screen">
+  <div class="page-header">
+    <span class="page-title">セッション終了</span>
+  </div>
+  <div class="screen-body">
+    <div class="result-card">
+      <div class="result-icon" id="res-icon">🎉</div>
+      <div class="result-title" id="res-title">よくできました！</div>
+      <div class="result-score" id="res-score">8/10</div>
+      <div class="result-xp" id="res-xp">+80 XP 獲得！</div>
+      <div class="result-breakdown" id="res-bd"></div>
+    </div>
+    <button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>
+  </div>
+</div>
+
+<!-- ===== ALBUM ===== -->
+<div id="screen-album" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="page-title">🎵 ジャケットアルバム</span>
+  </div>
+  <div class="screen-body">
+    <div class="album-info" id="album-info">レベルアップしてコレクションを集めよう！</div>
+    <div class="album-grid" id="album-grid"></div>
+  </div>
+</div>
+
+<!-- ===== HELP ===== -->
+<div id="screen-help" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="page-title">❓ 使い方・勉強法</span>
+  </div>
+  <div class="screen-body">
+
+    <div class="help-section">
+      <h3>🎸 このアプリについて</h3>
+      <div class="help-row">
+        <span class="help-icon">🎯</span>
+        <div>英語が得意になって<strong>英検5級（2026年1月）</strong>に合格することを目標にした学習アプリです。問題を解いてXPを貯め、Mrs. GREEN APPLEのジャケット写真を集めよう！</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>📖 単語カードの使い方</h3>
+      <div class="help-row">
+        <span class="help-icon">1️⃣</span>
+        <div>カードをタップすると日本語が表示されます</div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">2️⃣</span>
+        <div>日本語を見て意味がわかったら<strong style="color:var(--mga-green)">「✓ わかった」</strong>（+5 XP）、わからなかったら<strong style="color:var(--mga-red)">「✗ わからなかった」</strong>（+1 XP）をタップ</div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">3️⃣</span>
+        <div>カテゴリを選んで集中練習もできます（曜日・動詞・食べ物など）</div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">💡</span>
+        <div>正直に答えよう！わからなくても +1 XP もらえるから安心して</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>🎯 文法クイズの使い方</h3>
+      <div class="help-row">
+        <span class="help-icon">1️⃣</span>
+        <div>4つの選択肢から正しいものをタップ。正解で <strong>+10 XP</strong></div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">2️⃣</span>
+        <div>答えると解説が表示されるので、なぜ正解なのかを確認しよう</div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">3️⃣</span>
+        <div>10問ランダム出題。be動詞・疑問文・複数形・canなど英検5級の頻出問題が出るよ</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>🎵 アルバムの楽しみ方</h3>
+      <div class="help-row">
+        <span class="help-icon">🔒</span>
+        <div>最初はジャケットが裏向きに並んでいます</div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">⭐</span>
+        <div>XPを貯めてレベルアップすると新しいジャケットが解放されます</div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">✨</span>
+        <div>キラキラ光っているカードをタップするとジャケットがめくれます！</div>
+      </div>
+      <div class="help-row">
+        <span class="help-icon">🖼️</span>
+        <div>解放済みのジャケットはタップすると大きく見られます</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>⭐ XP・ランクシステム</h3>
+      <div class="help-row">
+        <span class="help-icon">🔥</span>
+        <div>毎日ログインで連続日数が増え、2日目以降は <strong>+20 XP ボーナス</strong>！</div>
+      </div>
+      <div class="help-row" style="flex-direction:column;gap:8px;">
+        <div style="font-weight:700;color:var(--text)">ランク一覧：</div>
+        <div class="rank-list" id="help-rank-list"></div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3>📅 英検5級合格スケジュール</h3>
+      <table class="schedule-table">
+        <tr><th>時期</th><th>目標</th><th>こなす量</th></tr>
+        <tr><td>6〜8月</td><td>基礎単語・be動詞</td><td>単語カード毎日10問</td></tr>
+        <tr><td>9〜10月</td><td>一般動詞・疑問文</td><td>クイズ毎日1セット</td></tr>
+        <tr><td>11〜12月</td><td>英検5級頻出演習</td><td>両方 + 間違い復習</td></tr>
+        <tr><td>1月</td><td>仕上げ・模擬テスト</td><td>全問題を繰り返し</td></tr>
+      </table>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-dim);line-height:1.6;">
+        💡 <strong>1日15〜20分</strong>続けることが大切！毎日少しずつが英検合格への近道です。
+      </div>
+    </div>
+
+    <button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>
+  </div>
+</div>
+
+<!-- ===== LEVEL UP ===== -->
+<div id="overlay-levelup">
+  <div class="lu-icon" id="lu-icon">🎸</div>
+  <div class="lu-title">LEVEL UP!</div>
+  <div class="lu-rank" id="lu-rank">ストリートミュージシャン</div>
+  <div class="lu-msg" id="lu-msg">ランクアップ！<br>新しいジャケット写真がアルバムに追加されたよ！<br>タップして開いてみよう！</div>
+  <button class="lu-btn lu-btn-main" onclick="goToAlbum()">🎵 アルバムで見る</button>
+  <button class="lu-btn lu-btn-skip" onclick="closeOverlay()">続けて学習する</button>
+</div>
+
+<!-- ===== PHOTO FULLSCREEN ===== -->
+<div id="overlay-photo" onclick="closePhoto()">
+  <img id="photo-img" src="" alt="">
+  <div id="overlay-photo-title"></div>
+  <button class="photo-close">閉じる</button>
+</div>
+
+<div class="confetti-c" id="confetti-c"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const RANKS = [
+  { name:'路上ライブ',              icon:'🎸', minXP:0 },
+  { name:'ストリートミュージシャン', icon:'🎤', minXP:80 },
+  { name:'インディーズデビュー',     icon:'💿', minXP:200 },
+  { name:'ライブハウス',             icon:'🎵', minXP:380 },
+  { name:'ホール公演',               icon:'🎼', minXP:600 },
+  { name:'野外フェス',               icon:'🌟', minXP:880 },
+  { name:'アリーナツアー',           icon:'🏟️', minXP:1200 },
+  { name:'武道館公演',               icon:'🏆', minXP:1600 },
+  { name:'全国アリーナツアー',       icon:'👑', minXP:2050 },
+  { name:'全国ドームツアー',         icon:'🌠', minXP:2500 },
+];
+
+const JACKETS = [
+  { file:'jacket_01.webp', title:'lulu' },
+  { file:'jacket_02.jpg',  title:'GOOD DAY' },
+  { file:'jacket_03.jpg',  title:'Love me, Love you' },
+  { file:'jacket_04.jpg',  title:'ダーリン' },
+  { file:'jacket_05.jpg',  title:'ライラック' },
+  { file:'jacket_06.jpg',  title:'WanteD!' },
+  { file:'jacket_07.jpg',  title:'UNITY' },
+  { file:'jacket_08.jpg',  title:'インフェルノ' },
+  { file:'jacket_09.jpg',  title:'TWELVE' },
+  { file:'jacket_10.jpg',  title:'10' },
+];
+
+const VOCAB = [
+  { en:'hello',        ja:'こんにちは',        cat:'挨拶' },
+  { en:'good morning', ja:'おはよう',          cat:'挨拶' },
+  { en:'good night',   ja:'おやすみ',          cat:'挨拶' },
+  { en:'thank you',    ja:'ありがとう',        cat:'挨拶' },
+  { en:'sorry',        ja:'ごめんなさい',      cat:'挨拶' },
+  { en:'please',       ja:'お願いします',      cat:'挨拶' },
+  { en:'yes',          ja:'はい',              cat:'挨拶' },
+  { en:'no',           ja:'いいえ',            cat:'挨拶' },
+  { en:'dog',      ja:'犬',       cat:'動物' },
+  { en:'cat',      ja:'猫',       cat:'動物' },
+  { en:'bird',     ja:'鳥',       cat:'動物' },
+  { en:'fish',     ja:'魚',       cat:'動物' },
+  { en:'horse',    ja:'馬',       cat:'動物' },
+  { en:'rabbit',   ja:'ウサギ',   cat:'動物' },
+  { en:'bear',     ja:'クマ',     cat:'動物' },
+  { en:'elephant', ja:'ゾウ',     cat:'動物' },
+  { en:'monkey',   ja:'サル',     cat:'動物' },
+  { en:'apple',     ja:'りんご',   cat:'食べ物' },
+  { en:'bread',     ja:'パン',     cat:'食べ物' },
+  { en:'egg',       ja:'卵',       cat:'食べ物' },
+  { en:'milk',      ja:'牛乳',     cat:'食べ物' },
+  { en:'rice',      ja:'ご飯・米', cat:'食べ物' },
+  { en:'water',     ja:'水',       cat:'食べ物' },
+  { en:'juice',     ja:'ジュース', cat:'食べ物' },
+  { en:'cake',      ja:'ケーキ',   cat:'食べ物' },
+  { en:'meat',      ja:'肉',       cat:'食べ物' },
+  { en:'soup',      ja:'スープ',   cat:'食べ物' },
+  { en:'red',    ja:'赤',       cat:'色' },
+  { en:'blue',   ja:'青',       cat:'色' },
+  { en:'green',  ja:'緑',       cat:'色' },
+  { en:'white',  ja:'白',       cat:'色' },
+  { en:'black',  ja:'黒',       cat:'色' },
+  { en:'yellow', ja:'黄色',     cat:'色' },
+  { en:'orange', ja:'オレンジ', cat:'色' },
+  { en:'pink',   ja:'ピンク',   cat:'色' },
+  { en:'soccer',   ja:'サッカー', cat:'スポーツ' },
+  { en:'tennis',   ja:'テニス',   cat:'スポーツ' },
+  { en:'baseball', ja:'野球',     cat:'スポーツ' },
+  { en:'swimming', ja:'水泳',     cat:'スポーツ' },
+  { en:'music',    ja:'音楽',     cat:'スポーツ' },
+  { en:'cooking',  ja:'料理',     cat:'スポーツ' },
+  { en:'dancing',  ja:'ダンス',   cat:'スポーツ' },
+  { en:'reading',  ja:'読書',     cat:'スポーツ' },
+  { en:'school',    ja:'学校',         cat:'学校' },
+  { en:'teacher',   ja:'先生',         cat:'学校' },
+  { en:'student',   ja:'生徒',         cat:'学校' },
+  { en:'book',      ja:'本',           cat:'学校' },
+  { en:'pen',       ja:'ペン',         cat:'学校' },
+  { en:'desk',      ja:'机',           cat:'学校' },
+  { en:'homework',  ja:'宿題',         cat:'学校' },
+  { en:'test',      ja:'テスト',       cat:'学校' },
+  { en:'class',     ja:'授業・クラス', cat:'学校' },
+  { en:'library',   ja:'図書館',       cat:'学校' },
+  { en:'English',   ja:'英語',         cat:'学校' },
+  { en:'Japanese',  ja:'国語・日本語', cat:'学校' },
+  { en:'math',      ja:'数学',         cat:'学校' },
+  { en:'father',  ja:'父',     cat:'家族' },
+  { en:'mother',  ja:'母',     cat:'家族' },
+  { en:'brother', ja:'兄・弟', cat:'家族' },
+  { en:'sister',  ja:'姉・妹', cat:'家族' },
+  { en:'friend',  ja:'友達',   cat:'家族' },
+  { en:'family',  ja:'家族',   cat:'家族' },
+  { en:'park',     ja:'公園',     cat:'場所' },
+  { en:'shop',     ja:'お店',     cat:'場所' },
+  { en:'hospital', ja:'病院',     cat:'場所' },
+  { en:'station',  ja:'駅',       cat:'場所' },
+  { en:'house',    ja:'家',       cat:'場所' },
+  { en:'city',     ja:'都市・町', cat:'場所' },
+  { en:'country',  ja:'国・田舎', cat:'場所' },
+  { en:'Japan',    ja:'日本',     cat:'場所' },
+  { en:'big',       ja:'大きい',       cat:'形容詞' },
+  { en:'small',     ja:'小さい',       cat:'形容詞' },
+  { en:'fast',      ja:'速い',         cat:'形容詞' },
+  { en:'slow',      ja:'遅い',         cat:'形容詞' },
+  { en:'beautiful', ja:'美しい',       cat:'形容詞' },
+  { en:'happy',     ja:'幸せな',       cat:'形容詞' },
+  { en:'sad',       ja:'悲しい',       cat:'形容詞' },
+  { en:'tired',     ja:'疲れた',       cat:'形容詞' },
+  { en:'hungry',    ja:'お腹が空いた', cat:'形容詞' },
+  { en:'hot',       ja:'暑い・熱い',   cat:'形容詞' },
+  { en:'cold',      ja:'寒い・冷たい', cat:'形容詞' },
+  { en:'new',       ja:'新しい',       cat:'形容詞' },
+  { en:'old',       ja:'古い・年老いた', cat:'形容詞' },
+  { en:'nice',      ja:'すてきな',     cat:'形容詞' },
+  { en:'great',     ja:'すごい・素晴らしい', cat:'形容詞' },
+  { en:'like',   ja:'好きだ',          cat:'動詞' },
+  { en:'have',   ja:'持っている',      cat:'動詞' },
+  { en:'play',   ja:'遊ぶ・演奏する',  cat:'動詞' },
+  { en:'eat',    ja:'食べる',          cat:'動詞' },
+  { en:'drink',  ja:'飲む',            cat:'動詞' },
+  { en:'go',     ja:'行く',            cat:'動詞' },
+  { en:'come',   ja:'来る',            cat:'動詞' },
+  { en:'see',    ja:'見る・会う',      cat:'動詞' },
+  { en:'know',   ja:'知っている',      cat:'動詞' },
+  { en:'study',  ja:'勉強する',        cat:'動詞' },
+  { en:'live',   ja:'住んでいる',      cat:'動詞' },
+  { en:'speak',  ja:'話す',            cat:'動詞' },
+  { en:'run',    ja:'走る',            cat:'動詞' },
+  { en:'walk',   ja:'歩く',            cat:'動詞' },
+  { en:'watch',  ja:'見る（画面など）', cat:'動詞' },
+  { en:'listen', ja:'聞く',            cat:'動詞' },
+  { en:'read',   ja:'読む',            cat:'動詞' },
+  { en:'write',  ja:'書く',            cat:'動詞' },
+  { en:'make',   ja:'作る',            cat:'動詞' },
+  { en:'want',   ja:'欲しい・したい',  cat:'動詞' },
+  { en:'think',  ja:'思う・考える',    cat:'動詞' },
+  { en:'help',   ja:'助ける',          cat:'動詞' },
+  { en:'use',    ja:'使う',            cat:'動詞' },
+  { en:'get',    ja:'得る・なる',      cat:'動詞' },
+  { en:'one',     ja:'1',    cat:'数字' },
+  { en:'two',     ja:'2',    cat:'数字' },
+  { en:'three',   ja:'3',    cat:'数字' },
+  { en:'four',    ja:'4',    cat:'数字' },
+  { en:'five',    ja:'5',    cat:'数字' },
+  { en:'six',     ja:'6',    cat:'数字' },
+  { en:'seven',   ja:'7',    cat:'数字' },
+  { en:'eight',   ja:'8',    cat:'数字' },
+  { en:'nine',    ja:'9',    cat:'数字' },
+  { en:'ten',     ja:'10',   cat:'数字' },
+  { en:'hundred', ja:'100',  cat:'数字' },
+  { en:'Monday',    ja:'月曜日', cat:'曜日' },
+  { en:'Tuesday',   ja:'火曜日', cat:'曜日' },
+  { en:'Wednesday', ja:'水曜日', cat:'曜日' },
+  { en:'Thursday',  ja:'木曜日', cat:'曜日' },
+  { en:'Friday',    ja:'金曜日', cat:'曜日' },
+  { en:'Saturday',  ja:'土曜日', cat:'曜日' },
+  { en:'Sunday',    ja:'日曜日', cat:'曜日' },
+  { en:'January',   ja:'1月',  cat:'月' },
+  { en:'February',  ja:'2月',  cat:'月' },
+  { en:'March',     ja:'3月',  cat:'月' },
+  { en:'April',     ja:'4月',  cat:'月' },
+  { en:'May',       ja:'5月',  cat:'月' },
+  { en:'June',      ja:'6月',  cat:'月' },
+  { en:'July',      ja:'7月',  cat:'月' },
+  { en:'August',    ja:'8月',  cat:'月' },
+  { en:'September', ja:'9月',  cat:'月' },
+  { en:'October',   ja:'10月', cat:'月' },
+  { en:'November',  ja:'11月', cat:'月' },
+  { en:'December',  ja:'12月', cat:'月' },
+];
+
+const QUIZZES = [
+  { q:'I ___ a student.',        c:['am','is','are','be'],                       a:0, exp:'主語がIのときは am を使います',                   cat:'be動詞' },
+  { q:'She ___ my friend.',      c:['am','is','are','be'],                       a:1, exp:'he / she / it のときは is を使います',            cat:'be動詞' },
+  { q:'We ___ classmates.',      c:['am','is','are','be'],                       a:2, exp:'we / you / they のときは are を使います',         cat:'be動詞' },
+  { q:'You ___ very kind.',      c:['am','is','are','be'],                       a:2, exp:'you のときは are を使います',                     cat:'be動詞' },
+  { q:'This ___ my bag.',        c:['am','is','are','be'],                       a:1, exp:'this / that は三人称単数 → is を使います',        cat:'be動詞' },
+  { q:'They ___ soccer players.',c:['am','is','are','was'],                      a:2, exp:'they のときは are を使います',                    cat:'be動詞' },
+  { q:'He ___ a good singer.',   c:['am','is','are','be'],                       a:1, exp:'he のときは is を使います',                       cat:'be動詞' },
+  { q:'___ you a student?',      c:['Am','Is','Are','Do'],                       a:2, exp:'you に be動詞の疑問文 → Are you ~?',              cat:'疑問文' },
+  { q:'___ he like soccer?',     c:['Am','Is','Do','Does'],                      a:3, exp:'he / she / it の一般動詞疑問文は Does を使います', cat:'疑問文' },
+  { q:'___ they play tennis?',   c:['Does','Do','Is','Are'],                     a:1, exp:'they / I / we / you の疑問文は Do を使います',    cat:'疑問文' },
+  { q:'___ she a teacher?',      c:['Do','Does','Is','Are'],                     a:2, exp:'she（単数）+ be動詞疑問文 → Is she ~?',           cat:'疑問文' },
+  { q:'___ you play the guitar?',c:['Do','Does','Is','Are'],                     a:0, exp:'you の一般動詞疑問文は Do を使います',             cat:'疑問文' },
+  { q:"I ___ like cats.",        c:["don't","doesn't","isn't","aren't"],         a:0, exp:"I の一般動詞否定文は don't を使います",            cat:'否定文' },
+  { q:"She ___ play the piano.", c:["don't","doesn't","isn't","aren't"],         a:1, exp:"she / he / it の否定文は doesn't を使います",     cat:'否定文' },
+  { q:"They ___ students.",      c:["don't","doesn't","isn't","aren't"],         a:3, exp:"they + be動詞の否定は aren't を使います",         cat:'否定文' },
+  { q:"He ___ at school today.", c:["don't","doesn't","isn't","aren't"],         a:2, exp:"he + be動詞の否定は isn't を使います",            cat:'否定文' },
+  { q:'one dog → two ___',       c:['dog','dogs','dogy','doges'],                a:1, exp:'普通の名詞は s をつけます',                        cat:'複数形' },
+  { q:'one box → three ___',     c:['box','boxs','boxes','boxies'],              a:2, exp:'x / s / sh / ch で終わる名詞は es をつけます',    cat:'複数形' },
+  { q:'one city → many ___',     c:['citys','cities','city','cityes'],           a:1, exp:'子音 + y → y を i に変えて es をつけます',        cat:'複数形' },
+  { q:'one child → two ___',     c:['childs','children','childes','child'],      a:1, exp:'child の複数形は children（不規則変化）',          cat:'複数形' },
+  { q:'She ___ swim very well.',      c:['can','cans','is can','does can'],       a:0, exp:'can は主語にかかわらず形が変わりません',            cat:'can' },
+  { q:'___ you speak English?',       c:['Do','Are','Can','Is'],                  a:2, exp:'can の疑問文: Can + 主語 + 動詞の原形',           cat:'can' },
+  { q:"I ___ play the guitar.",       c:["can't","don't can","isn't","no can"],   a:0, exp:"can の否定は can't (cannot)",                    cat:'can' },
+  { q:'He ___ run fast.',             c:['can','cans','is able','does can'],      a:0, exp:'can は he でも変化しません',                       cat:'can' },
+  { q:'He ___ soccer every day.',     c:['play','plays','playing','played'],      a:1, exp:'he / she / it のとき動詞に s をつけます（三単現）', cat:'三単現' },
+  { q:'She ___ music.',               c:['like','likes','liking','liked'],        a:1, exp:'she のとき likes の形になります',                  cat:'三単現' },
+  { q:'Tom ___ to school by bus.',    c:['go','goes','going','gone'],             a:1, exp:'三単現: go → goes（s ではなく es）',               cat:'三単現' },
+  { q:'She ___ English every night.', c:['study','studies','studying','studys'],  a:1, exp:'三単現: y → ies の変化 (study → studies)',        cat:'三単現' },
+  { q:'I study English ___ Monday.',      c:['in','at','on','by'],               a:2, exp:'曜日・特定の日には on を使います',                  cat:'前置詞' },
+  { q:"The class starts ___ 8 o'clock.", c:['in','on','at','by'],                a:2, exp:'時刻には at を使います',                           cat:'前置詞' },
+  { q:'I go to school ___ the morning.', c:['on','in','at','by'],                a:1, exp:'morning / afternoon / evening には in を使います',  cat:'前置詞' },
+  { q:'I live ___ Japan.',               c:['at','on','in','by'],                a:2, exp:'国・都市・場所には in を使います',                  cat:'前置詞' },
+  { q:"What's this? — ___ a pencil.", c:["It's","This's","That's","He's"],       a:0, exp:"「これは何ですか」の答えは It's ~ です",            cat:'会話' },
+  { q:"Where ___ you from?",          c:['do','are','is','am'],                  a:1, exp:'Where are you from? = どこ出身ですか？',            cat:'会話' },
+  { q:"How old ___ you?",             c:['do','are','is','am'],                  a:1, exp:'How old are you? = 何歳ですか？',                  cat:'会話' },
+  { q:"What time ___ it?",            c:['do','are','is','am'],                  a:2, exp:'What time is it? = 何時ですか？',                  cat:'会話' },
+  { q:"___ is your name?",            c:['Who','What','Where','How'],            a:1, exp:'名前を聞くときは What is your name?',              cat:'会話' },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let S = { xp:0, rank:0, unlockedPhotos:[], revealedPhotos:[], streak:0, lastDate:'' };
+function loadS() { try { const d=localStorage.getItem('eigo-quest'); if(d) S={...S,...JSON.parse(d)}; } catch(e){} }
+function saveS() { localStorage.setItem('eigo-quest', JSON.stringify(S)); }
+
+// ============================================================
+// RANK
+// ============================================================
+function rankOf(xp) { for(let i=RANKS.length-1;i>=0;i--) if(xp>=RANKS[i].minXP) return i; return 0; }
+
+function addXP(n, el) {
+  const oldR = rankOf(S.xp);
+  S.xp += n; S.rank = rankOf(S.xp);
+  if (el) {
+    const rect = el.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'xp-popup';
+    pop.textContent = '+' + n + ' XP';
+    pop.style.left = Math.max(0, rect.left + rect.width/2 - 35) + 'px';
+    pop.style.top = Math.max(0, rect.top - 10) + 'px';
+    document.body.appendChild(pop);
+    setTimeout(() => pop.remove(), 1200);
+  }
+  if (S.rank > oldR) {
+    for (let r = oldR+1; r <= S.rank; r++) {
+      if (r < JACKETS.length && !S.unlockedPhotos.includes(r)) S.unlockedPhotos.push(r);
+    }
+    saveS();
+    setTimeout(() => showLevelUp(S.rank), 400);
+  } else { saveS(); }
+}
+
+// ============================================================
+// SCREENS
+// ============================================================
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() { updateHome(); show('screen-home'); }
+
+function updateHome() {
+  const ri = rankOf(S.xp), r = RANKS[ri], rn = RANKS[ri+1];
+  document.getElementById('home-icon').textContent = r.icon;
+  document.getElementById('home-rank').textContent = r.name;
+  const cur = S.xp - r.minXP, span = rn ? rn.minXP - r.minXP : 1;
+  const pct = rn ? Math.min(100, cur/span*100) : 100;
+  document.getElementById('home-bar').style.width = pct + '%';
+  document.getElementById('home-xp-cur').textContent = cur + ' XP';
+  document.getElementById('home-xp-nxt').textContent = rn ? '次: ' + rn.minXP + ' XP' : '★ MAX';
+  document.getElementById('home-total').textContent = '累計 ' + S.xp + ' XP';
+  document.getElementById('home-streak').textContent = S.streak;
+  document.getElementById('home-date').textContent = new Date().toLocaleDateString('ja-JP');
+  const rev = S.revealedPhotos.length;
+  document.getElementById('home-album-status').textContent = rev + '/10枚';
+  document.getElementById('home-album-sub').textContent = rev + ' / 10 枚解放中';
+  const pending = S.unlockedPhotos.filter(i => !S.revealedPhotos.includes(i)).length;
+  const btn = document.getElementById('album-menu-btn');
+  let nb = btn.querySelector('.new-badge');
+  if (pending > 0) {
+    if (!nb) { nb = document.createElement('span'); nb.className = 'new-badge'; btn.appendChild(nb); }
+    nb.textContent = 'NEW ' + pending;
+  } else if (nb) nb.remove();
+}
+
+function showHelp() {
+  // ランク一覧を組み立て
+  const list = document.getElementById('help-rank-list');
+  if (list) {
+    list.innerHTML = RANKS.map(r =>
+      `<div class="rank-item">${r.icon} ${r.name}</div>`).join('');
+  }
+  show('screen-help');
+}
+
+// ============================================================
+// VOCAB
+// ============================================================
+let vc = {};
+
+function startVocab(cat) {
+  cat = cat || 'すべて';
+  let pool = cat === 'すべて' ? [...VOCAB] : VOCAB.filter(v => v.cat === cat);
+  pool = pool.sort(() => Math.random()-0.5).slice(0, 20);
+  vc = { pool, idx:0, ok:0, ng:0, xp:0, flipped:false, cat };
+  document.getElementById('vocab-ok').textContent = '0';
+  document.getElementById('vocab-total').textContent = pool.length;
+  document.getElementById('vocab-xp').textContent = '+0 XP';
+
+  const cats = ['すべて', ...new Set(VOCAB.map(v => v.cat))];
+  const el = document.getElementById('vocab-cats');
+  el.innerHTML = '';
+  cats.forEach(c => {
+    const chip = document.createElement('button');
+    chip.className = 'cat-chip' + (c === cat ? ' active' : '');
+    chip.textContent = c;
+    chip.onclick = () => startVocab(c);
+    el.appendChild(chip);
+  });
+
+  show('screen-vocab');
+  loadWord();
+}
+
+function loadWord() {
+  const w = vc.pool[vc.idx];
+  if (!w) { finishVocab(); return; }
+  vc.flipped = false;
+  document.getElementById('vocab-card').classList.remove('flipped');
+  document.getElementById('vocab-en').textContent = w.en;
+  document.getElementById('vocab-en2').textContent = w.en;
+  document.getElementById('vocab-ja').textContent = w.ja;
+  document.getElementById('vocab-cat').textContent = w.cat;
+  document.getElementById('vocab-cat2').textContent = w.cat;
+  document.getElementById('vocab-cat-label').textContent = w.cat;
+  document.getElementById('vocab-btns').style.display = 'none';
+}
+
+function flipCard() {
+  if (vc.flipped) return;
+  vc.flipped = true;
+  document.getElementById('vocab-card').classList.add('flipped');
+  document.getElementById('vocab-btns').style.display = 'flex';
+}
+
+function vocabAnswer(ok) {
+  vc.xp += ok ? 5 : 1; vc.idx++;
+  if (ok) vc.ok++; else vc.ng++;
+  document.getElementById('vocab-ok').textContent = vc.ok;
+  document.getElementById('vocab-xp').textContent = '+' + vc.xp + ' XP';
+  vc.idx >= vc.pool.length ? finishVocab() : loadWord();
+}
+
+function finishVocab() {
+  const total = vc.ok + vc.ng, pct = total ? Math.round(vc.ok/total*100) : 0;
+  if (vc.xp > 0) addXP(vc.xp, document.getElementById('vocab-xp'));
+  showResult({
+    icon: pct>=80?'🎉':pct>=50?'😊':'💪',
+    title: pct>=80?'パーフェクト！':pct>=50?'よくできました！':'もう一度チャレンジ！',
+    score: vc.ok + ' / ' + total, xp: vc.xp,
+    bd: [['正解', vc.ok+'問'],['不正解', vc.ng+'問'],['正答率', pct+'%']],
+  });
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+let qc = {};
+
+function startQuiz() {
+  const qs = [...QUIZZES].sort(() => Math.random()-0.5).slice(0, 10);
+  qc = { qs, idx:0, ok:0, ng:0, xp:0, answered:false };
+  document.getElementById('quiz-xp').textContent = '+0 XP';
+  show('screen-quiz');
+  loadQ();
+}
+
+function loadQ() {
+  const q = qc.qs[qc.idx]; qc.answered = false;
+  const n = qc.idx+1, t = qc.qs.length;
+  document.getElementById('quiz-meta').textContent = '問題 ' + n + ' / ' + t;
+  document.getElementById('quiz-bar').style.width = ((n-1)/t*100) + '%';
+  document.getElementById('quiz-cat').textContent = q.cat;
+  document.getElementById('quiz-q').textContent = q.q;
+  const ch = document.getElementById('quiz-choices');
+  ch.innerHTML = '';
+  q.c.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-choice'; btn.textContent = c;
+    btn.onclick = () => answerQ(i);
+    ch.appendChild(btn);
+  });
+  document.getElementById('quiz-exp').classList.remove('show','ok','ng');
+  document.getElementById('quiz-next').classList.remove('show');
+}
+
+function answerQ(i) {
+  if (qc.answered) return;
+  qc.answered = true;
+  const q = qc.qs[qc.idx], ok = i===q.a;
+  qc.xp += ok ? 10 : 2;
+  if (ok) qc.ok++; else qc.ng++;
+  document.getElementById('quiz-xp').textContent = '+' + qc.xp + ' XP';
+  document.querySelectorAll('.quiz-choice').forEach((b, j) => {
+    b.onclick = null;
+    if (j===q.a) b.classList.add(ok?'correct':'show-correct');
+    if (j===i && !ok) b.classList.add('wrong');
+  });
+  const expEl = document.getElementById('quiz-exp');
+  expEl.textContent = (ok ? '✓ 正解！ ' : '✗ 不正解。') + q.exp;
+  expEl.classList.add('show', ok?'ok':'ng');
+  document.getElementById('quiz-next').classList.add('show');
+}
+
+function nextQ() {
+  qc.idx++;
+  if (qc.idx >= qc.qs.length) {
+    addXP(qc.xp, document.getElementById('quiz-xp'));
+    const t = qc.ok+qc.ng, pct = Math.round(qc.ok/t*100);
+    showResult({
+      icon: pct>=80?'🏆':pct>=60?'🎉':pct>=40?'😊':'💪',
+      title: pct>=80?'完璧！':pct>=60?'よくできました！':pct>=40?'まあまあ！':'もっと練習しよう！',
+      score: qc.ok + ' / ' + t, xp: qc.xp,
+      bd: [['正解', qc.ok+'問'],['不正解', qc.ng+'問'],['正答率', pct+'%']],
+    });
+  } else { loadQ(); }
+}
+
+// ============================================================
+// RESULT
+// ============================================================
+function showResult({ icon, title, score, xp, bd }) {
+  document.getElementById('res-icon').textContent = icon;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-xp').textContent = '+' + xp + ' XP 獲得！';
+  document.getElementById('res-bd').innerHTML = bd.map(([l,v]) =>
+    `<div class="result-row"><span>${l}</span><strong>${v}</strong></div>`).join('');
+  show('screen-result');
+}
+
+// ============================================================
+// ALBUM
+// ============================================================
+function showAlbum() { renderAlbum(); show('screen-album'); }
+
+function renderAlbum() {
+  const grid = document.getElementById('album-grid');
+  grid.innerHTML = '';
+  const rev = S.revealedPhotos.length;
+  document.getElementById('album-info').textContent =
+    rev + ' / ' + JACKETS.length + ' 枚解放済み　—　レベルアップで増えていくよ！';
+
+  JACKETS.forEach((j, i) => {
+    const unlocked = S.unlockedPhotos.includes(i);
+    const revealed = S.revealedPhotos.includes(i);
+    const wrap = document.createElement('div'); wrap.className = 'jacket-wrap';
+    const card = document.createElement('div'); card.className = 'jacket-card';
+
+    if (revealed) {
+      card.classList.add('flipped','revealed');
+      card.innerHTML = `<div class="jacket-inner"><div class="jacket-front"></div><div class="jacket-back"><img src="jackets/${j.file}" alt="${j.title}" loading="lazy"></div></div>`;
+      card.onclick = () => openPhoto(i);
+    } else if (unlocked) {
+      card.innerHTML = `<div class="jacket-inner"><div class="jacket-front unlocked"><div class="unlock-icon">🎵</div><div class="unlock-hint">タップして開く！</div></div><div class="jacket-back"><img src="jackets/${j.file}" alt="${j.title}" loading="lazy"></div></div>`;
+      card.onclick = () => flipJacket(i, card, j);
+    } else {
+      const unlockRank = RANKS[Math.min(i, RANKS.length-1)];
+      card.innerHTML = `<div class="jacket-inner"><div class="jacket-front locked"><div class="lock-icon">🔒</div><div class="lock-text">${unlockRank.name}で解放</div></div><div class="jacket-back"></div></div>`;
+    }
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'jacket-title';
+    titleEl.textContent = revealed ? j.title : (unlocked ? '？？？' : '🔒');
+    wrap.appendChild(card); wrap.appendChild(titleEl);
+    grid.appendChild(wrap);
+  });
+}
+
+function flipJacket(i, cardEl, j) {
+  S.revealedPhotos.push(i); saveS();
+  cardEl.classList.add('flipped');
+  cardEl.onclick = () => openPhoto(i);
+  const titleEl = cardEl.nextElementSibling;
+  if (titleEl) setTimeout(() => { titleEl.textContent = j.title; }, 700);
+  const rev = S.revealedPhotos.length;
+  document.getElementById('album-info').textContent =
+    rev + ' / ' + JACKETS.length + ' 枚解放済み　—　レベルアップで増えていくよ！';
+}
+
+function openPhoto(i) {
+  const j = JACKETS[i];
+  document.getElementById('photo-img').src = 'jackets/' + j.file;
+  document.getElementById('overlay-photo-title').textContent = j.title;
+  document.getElementById('overlay-photo').classList.add('show');
+}
+function closePhoto() { document.getElementById('overlay-photo').classList.remove('show'); }
+
+// ============================================================
+// LEVEL UP
+// ============================================================
+function showLevelUp(ri) {
+  const r = RANKS[ri];
+  document.getElementById('lu-icon').textContent = r.icon;
+  document.getElementById('lu-rank').textContent = r.name;
+  document.getElementById('overlay-levelup').classList.add('show');
+  confetti();
+}
+function closeOverlay() {
+  document.getElementById('overlay-levelup').classList.remove('show');
+  document.getElementById('confetti-c').innerHTML = '';
+}
+function goToAlbum() { closeOverlay(); showAlbum(); }
+
+function confetti() {
+  const c = document.getElementById('confetti-c'); c.innerHTML = '';
+  const cols = ['#16a34a','#ef4444','#3b82f6','#f59e0b','#22c55e','#a78bfa','#f472b6'];
+  for (let i=0; i<70; i++) {
+    const p = document.createElement('div'); p.className = 'cp';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.background = cols[Math.floor(Math.random()*cols.length)];
+    p.style.animationDuration = (1.5 + Math.random()*2) + 's';
+    p.style.animationDelay = (Math.random()*0.6) + 's';
+    const sz = 6 + Math.random()*8;
+    p.style.width = sz+'px'; p.style.height = sz+'px';
+    c.appendChild(p);
+  }
+  setTimeout(() => { c.innerHTML = ''; }, 3500);
+}
+
+// ============================================================
+// STREAK
+// ============================================================
+function checkStreak() {
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now()-86400000).toDateString();
+  if (S.lastDate === today) return;
+  S.streak = S.lastDate === yesterday ? S.streak+1 : 1;
+  S.lastDate = today;
+  saveS();
+  if (S.streak > 1) setTimeout(() => addXP(20, document.getElementById('home-streak')), 700);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadS();
+if (!S.unlockedPhotos.includes(0)) { S.unlockedPhotos.push(0); saveS(); }
+checkStreak();
+updateHome();
+</script>
+</body>
+</html>
