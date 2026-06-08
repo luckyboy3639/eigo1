@@ -173,7 +173,7 @@ body {
 }
 .cat-chip.active { background: var(--mga-green); border-color: var(--mga-green); color: #fff; }
 
-.vocab-card { height: 220px; cursor: pointer; margin-bottom: 14px; perspective: 1000px; }
+.vocab-card { height: 260px; cursor: pointer; margin-bottom: 14px; perspective: 1000px; }
 .vocab-inner {
   width: 100%; height: 100%; position: relative;
   transform-style: preserve-3d;
@@ -200,8 +200,8 @@ body {
   color: #fff;
 }
 .vocab-en { font-size: 34px; font-weight: 900; text-align: center; color: var(--text); }
-.vocab-ja { font-size: 30px; font-weight: 900; color: #fff; text-align: center; }
-.vocab-en-sub { font-size: 18px; color: rgba(255,255,255,0.7); margin-top: 8px; }
+.vocab-ja { font-size: 26px; font-weight: 900; color: #fff; text-align: center; }
+.vocab-en-sub { font-size: 15px; color: rgba(255,255,255,0.65); margin-top: 4px; }
 .vocab-cat-tag {
   font-size: 11px; font-weight: 700;
   background: var(--mga-light); color: var(--mga-green);
@@ -210,9 +210,12 @@ body {
 .vocab-cat-tag-inv {
   font-size: 11px; font-weight: 700;
   background: rgba(255,255,255,0.2); color: #fff;
-  padding: 2px 10px; border-radius: 999px; margin-top: 8px;
+  padding: 2px 10px; border-radius: 999px; margin-top: 4px;
 }
 .vocab-tap { font-size: 12px; color: var(--text-dim); margin-top: 12px; }
+.vocab-ex { margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.25); padding-top: 8px; text-align: center; width: 100%; }
+.vocab-ex-en { font-size: 13px; color: rgba(255,255,255,0.9); font-style: italic; }
+.vocab-ex-ja { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 2px; }
 
 .answer-btns { display: flex; gap: 12px; margin-bottom: 12px; }
 .answer-btn {
@@ -524,6 +527,10 @@ body {
           <div class="vocab-ja" id="vocab-ja"></div>
           <div class="vocab-en-sub" id="vocab-en2"></div>
           <div class="vocab-cat-tag-inv" id="vocab-cat2"></div>
+          <div class="vocab-ex" id="vocab-ex">
+            <div class="vocab-ex-en" id="vocab-ex-en"></div>
+            <div class="vocab-ex-ja" id="vocab-ex-ja"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -633,7 +640,7 @@ body {
       </div>
       <div class="help-row">
         <span class="help-icon">3️⃣</span>
-        <div>10問ランダム出題。be動詞・疑問文・複数形・canなど英検5級の頻出問題が出るよ</div>
+        <div>10問ランダム出題。be動詞・疑問文・複数形・can・代名詞・疑問詞・命令文など英検5級の頻出問題が出るよ</div>
       </div>
     </div>
 
@@ -737,145 +744,158 @@ const JACKETS = [
 ];
 
 const VOCAB = [
-  { en:'hello',        ja:'こんにちは',        cat:'挨拶' },
-  { en:'good morning', ja:'おはよう',          cat:'挨拶' },
-  { en:'good night',   ja:'おやすみ',          cat:'挨拶' },
-  { en:'thank you',    ja:'ありがとう',        cat:'挨拶' },
-  { en:'sorry',        ja:'ごめんなさい',      cat:'挨拶' },
-  { en:'please',       ja:'お願いします',      cat:'挨拶' },
-  { en:'yes',          ja:'はい',              cat:'挨拶' },
-  { en:'no',           ja:'いいえ',            cat:'挨拶' },
-  { en:'dog',      ja:'犬',       cat:'動物' },
-  { en:'cat',      ja:'猫',       cat:'動物' },
-  { en:'bird',     ja:'鳥',       cat:'動物' },
-  { en:'fish',     ja:'魚',       cat:'動物' },
-  { en:'horse',    ja:'馬',       cat:'動物' },
-  { en:'rabbit',   ja:'ウサギ',   cat:'動物' },
-  { en:'bear',     ja:'クマ',     cat:'動物' },
-  { en:'elephant', ja:'ゾウ',     cat:'動物' },
-  { en:'monkey',   ja:'サル',     cat:'動物' },
-  { en:'apple',     ja:'りんご',   cat:'食べ物' },
-  { en:'bread',     ja:'パン',     cat:'食べ物' },
-  { en:'egg',       ja:'卵',       cat:'食べ物' },
-  { en:'milk',      ja:'牛乳',     cat:'食べ物' },
-  { en:'rice',      ja:'ご飯・米', cat:'食べ物' },
-  { en:'water',     ja:'水',       cat:'食べ物' },
-  { en:'juice',     ja:'ジュース', cat:'食べ物' },
-  { en:'cake',      ja:'ケーキ',   cat:'食べ物' },
-  { en:'meat',      ja:'肉',       cat:'食べ物' },
-  { en:'soup',      ja:'スープ',   cat:'食べ物' },
-  { en:'red',    ja:'赤',       cat:'色' },
-  { en:'blue',   ja:'青',       cat:'色' },
-  { en:'green',  ja:'緑',       cat:'色' },
-  { en:'white',  ja:'白',       cat:'色' },
-  { en:'black',  ja:'黒',       cat:'色' },
-  { en:'yellow', ja:'黄色',     cat:'色' },
-  { en:'orange', ja:'オレンジ', cat:'色' },
-  { en:'pink',   ja:'ピンク',   cat:'色' },
-  { en:'soccer',   ja:'サッカー', cat:'スポーツ' },
-  { en:'tennis',   ja:'テニス',   cat:'スポーツ' },
-  { en:'baseball', ja:'野球',     cat:'スポーツ' },
-  { en:'swimming', ja:'水泳',     cat:'スポーツ' },
-  { en:'music',    ja:'音楽',     cat:'スポーツ' },
-  { en:'cooking',  ja:'料理',     cat:'スポーツ' },
-  { en:'dancing',  ja:'ダンス',   cat:'スポーツ' },
-  { en:'reading',  ja:'読書',     cat:'スポーツ' },
-  { en:'school',    ja:'学校',         cat:'学校' },
-  { en:'teacher',   ja:'先生',         cat:'学校' },
-  { en:'student',   ja:'生徒',         cat:'学校' },
-  { en:'book',      ja:'本',           cat:'学校' },
-  { en:'pen',       ja:'ペン',         cat:'学校' },
-  { en:'desk',      ja:'机',           cat:'学校' },
-  { en:'homework',  ja:'宿題',         cat:'学校' },
-  { en:'test',      ja:'テスト',       cat:'学校' },
-  { en:'class',     ja:'授業・クラス', cat:'学校' },
-  { en:'library',   ja:'図書館',       cat:'学校' },
-  { en:'English',   ja:'英語',         cat:'学校' },
-  { en:'Japanese',  ja:'国語・日本語', cat:'学校' },
-  { en:'math',      ja:'数学',         cat:'学校' },
-  { en:'father',  ja:'父',     cat:'家族' },
-  { en:'mother',  ja:'母',     cat:'家族' },
-  { en:'brother', ja:'兄・弟', cat:'家族' },
-  { en:'sister',  ja:'姉・妹', cat:'家族' },
-  { en:'friend',  ja:'友達',   cat:'家族' },
-  { en:'family',  ja:'家族',   cat:'家族' },
-  { en:'park',     ja:'公園',     cat:'場所' },
-  { en:'shop',     ja:'お店',     cat:'場所' },
-  { en:'hospital', ja:'病院',     cat:'場所' },
-  { en:'station',  ja:'駅',       cat:'場所' },
-  { en:'house',    ja:'家',       cat:'場所' },
-  { en:'city',     ja:'都市・町', cat:'場所' },
-  { en:'country',  ja:'国・田舎', cat:'場所' },
-  { en:'Japan',    ja:'日本',     cat:'場所' },
-  { en:'big',       ja:'大きい',       cat:'形容詞' },
-  { en:'small',     ja:'小さい',       cat:'形容詞' },
-  { en:'fast',      ja:'速い',         cat:'形容詞' },
-  { en:'slow',      ja:'遅い',         cat:'形容詞' },
-  { en:'beautiful', ja:'美しい',       cat:'形容詞' },
-  { en:'happy',     ja:'幸せな',       cat:'形容詞' },
-  { en:'sad',       ja:'悲しい',       cat:'形容詞' },
-  { en:'tired',     ja:'疲れた',       cat:'形容詞' },
-  { en:'hungry',    ja:'お腹が空いた', cat:'形容詞' },
-  { en:'hot',       ja:'暑い・熱い',   cat:'形容詞' },
-  { en:'cold',      ja:'寒い・冷たい', cat:'形容詞' },
-  { en:'new',       ja:'新しい',       cat:'形容詞' },
-  { en:'old',       ja:'古い・年老いた', cat:'形容詞' },
-  { en:'nice',      ja:'すてきな',     cat:'形容詞' },
-  { en:'great',     ja:'すごい・素晴らしい', cat:'形容詞' },
-  { en:'like',   ja:'好きだ',          cat:'動詞' },
-  { en:'have',   ja:'持っている',      cat:'動詞' },
-  { en:'play',   ja:'遊ぶ・演奏する',  cat:'動詞' },
-  { en:'eat',    ja:'食べる',          cat:'動詞' },
-  { en:'drink',  ja:'飲む',            cat:'動詞' },
-  { en:'go',     ja:'行く',            cat:'動詞' },
-  { en:'come',   ja:'来る',            cat:'動詞' },
-  { en:'see',    ja:'見る・会う',      cat:'動詞' },
-  { en:'know',   ja:'知っている',      cat:'動詞' },
-  { en:'study',  ja:'勉強する',        cat:'動詞' },
-  { en:'live',   ja:'住んでいる',      cat:'動詞' },
-  { en:'speak',  ja:'話す',            cat:'動詞' },
-  { en:'run',    ja:'走る',            cat:'動詞' },
-  { en:'walk',   ja:'歩く',            cat:'動詞' },
-  { en:'watch',  ja:'見る（画面など）', cat:'動詞' },
-  { en:'listen', ja:'聞く',            cat:'動詞' },
-  { en:'read',   ja:'読む',            cat:'動詞' },
-  { en:'write',  ja:'書く',            cat:'動詞' },
-  { en:'make',   ja:'作る',            cat:'動詞' },
-  { en:'want',   ja:'欲しい・したい',  cat:'動詞' },
-  { en:'think',  ja:'思う・考える',    cat:'動詞' },
-  { en:'help',   ja:'助ける',          cat:'動詞' },
-  { en:'use',    ja:'使う',            cat:'動詞' },
-  { en:'get',    ja:'得る・なる',      cat:'動詞' },
-  { en:'one',     ja:'1',    cat:'数字' },
-  { en:'two',     ja:'2',    cat:'数字' },
-  { en:'three',   ja:'3',    cat:'数字' },
-  { en:'four',    ja:'4',    cat:'数字' },
-  { en:'five',    ja:'5',    cat:'数字' },
-  { en:'six',     ja:'6',    cat:'数字' },
-  { en:'seven',   ja:'7',    cat:'数字' },
-  { en:'eight',   ja:'8',    cat:'数字' },
-  { en:'nine',    ja:'9',    cat:'数字' },
-  { en:'ten',     ja:'10',   cat:'数字' },
-  { en:'hundred', ja:'100',  cat:'数字' },
-  { en:'Monday',    ja:'月曜日', cat:'曜日' },
-  { en:'Tuesday',   ja:'火曜日', cat:'曜日' },
-  { en:'Wednesday', ja:'水曜日', cat:'曜日' },
-  { en:'Thursday',  ja:'木曜日', cat:'曜日' },
-  { en:'Friday',    ja:'金曜日', cat:'曜日' },
-  { en:'Saturday',  ja:'土曜日', cat:'曜日' },
-  { en:'Sunday',    ja:'日曜日', cat:'曜日' },
-  { en:'January',   ja:'1月',  cat:'月' },
-  { en:'February',  ja:'2月',  cat:'月' },
-  { en:'March',     ja:'3月',  cat:'月' },
-  { en:'April',     ja:'4月',  cat:'月' },
-  { en:'May',       ja:'5月',  cat:'月' },
-  { en:'June',      ja:'6月',  cat:'月' },
-  { en:'July',      ja:'7月',  cat:'月' },
-  { en:'August',    ja:'8月',  cat:'月' },
-  { en:'September', ja:'9月',  cat:'月' },
-  { en:'October',   ja:'10月', cat:'月' },
-  { en:'November',  ja:'11月', cat:'月' },
-  { en:'December',  ja:'12月', cat:'月' },
+  // 挨拶
+  { en:'hello',        ja:'こんにちは',   cat:'挨拶', ex:"Hello! I'm Taro.",        exja:'こんにちは！タロウです。' },
+  { en:'good morning', ja:'おはよう',     cat:'挨拶', ex:'Good morning, everyone.', exja:'おはようございます、みなさん。' },
+  { en:'good night',   ja:'おやすみ',     cat:'挨拶', ex:'Good night, Mom.',        exja:'おやすみ、お母さん。' },
+  { en:'thank you',    ja:'ありがとう',   cat:'挨拶', ex:'Thank you very much!',    exja:'どうもありがとう！' },
+  { en:'sorry',        ja:'ごめんなさい', cat:'挨拶', ex:"I'm sorry, teacher.",     exja:'先生、ごめんなさい。' },
+  { en:'please',       ja:'お願いします', cat:'挨拶', ex:'Help me, please.',        exja:'助けてください。' },
+  { en:'yes',          ja:'はい',         cat:'挨拶', ex:'Yes, I can!',             exja:'はい、できます！' },
+  { en:'no',           ja:'いいえ',       cat:'挨拶', ex:"No, I don't.",            exja:'いいえ、しません。' },
+  // 動物
+  { en:'dog',      ja:'犬',     cat:'動物', ex:'I have a dog.',        exja:'私は犬を飼っています。' },
+  { en:'cat',      ja:'猫',     cat:'動物', ex:'My cat is white.',     exja:'私の猫は白いです。' },
+  { en:'bird',     ja:'鳥',     cat:'動物', ex:'That bird can fly.',   exja:'あの鳥は飛べます。' },
+  { en:'fish',     ja:'魚',     cat:'動物', ex:'I like fish.',         exja:'私は魚が好きです。' },
+  { en:'horse',    ja:'馬',     cat:'動物', ex:'Horses run fast.',     exja:'馬は速く走ります。' },
+  { en:'rabbit',   ja:'ウサギ', cat:'動物', ex:'She has a rabbit.',    exja:'彼女はウサギを飼っています。' },
+  { en:'bear',     ja:'クマ',   cat:'動物', ex:'Bears are big.',       exja:'クマは大きいです。' },
+  { en:'elephant', ja:'ゾウ',   cat:'動物', ex:'I like elephants.',    exja:'私はゾウが好きです。' },
+  { en:'monkey',   ja:'サル',   cat:'動物', ex:'Monkeys can climb.',   exja:'サルは木に登れます。' },
+  // 食べ物
+  { en:'apple',  ja:'りんご',   cat:'食べ物', ex:'I eat an apple.',       exja:'私はりんごを食べます。' },
+  { en:'bread',  ja:'パン',     cat:'食べ物', ex:'I like bread.',         exja:'私はパンが好きです。' },
+  { en:'egg',    ja:'卵',       cat:'食べ物', ex:'She eats eggs.',        exja:'彼女は卵を食べます。' },
+  { en:'milk',   ja:'牛乳',     cat:'食べ物', ex:'Drink your milk.',      exja:'牛乳を飲んでね。' },
+  { en:'rice',   ja:'ご飯・米', cat:'食べ物', ex:'I eat rice every day.', exja:'私は毎日ご飯を食べます。' },
+  { en:'water',  ja:'水',       cat:'食べ物', ex:'I drink water.',        exja:'私は水を飲みます。' },
+  { en:'juice',  ja:'ジュース', cat:'食べ物', ex:'This juice is good.',   exja:'このジュースはおいしい。' },
+  { en:'cake',   ja:'ケーキ',   cat:'食べ物', ex:'I like cake.',          exja:'私はケーキが好きです。' },
+  { en:'meat',   ja:'肉',       cat:'食べ物', ex:'He likes meat.',        exja:'彼は肉が好きです。' },
+  { en:'soup',   ja:'スープ',   cat:'食べ物', ex:'This soup is hot.',     exja:'このスープは熱い。' },
+  // 色
+  { en:'red',    ja:'赤',       cat:'色', ex:'I like red.',          exja:'私は赤が好きです。' },
+  { en:'blue',   ja:'青',       cat:'色', ex:'The sky is blue.',     exja:'空は青いです。' },
+  { en:'green',  ja:'緑',       cat:'色', ex:'I like green.',        exja:'私は緑が好きです。' },
+  { en:'white',  ja:'白',       cat:'色', ex:'My cat is white.',     exja:'私の猫は白いです。' },
+  { en:'black',  ja:'黒',       cat:'色', ex:'His bag is black.',    exja:'彼のカバンは黒いです。' },
+  { en:'yellow', ja:'黄色',     cat:'色', ex:'Bananas are yellow.',  exja:'バナナは黄色いです。' },
+  { en:'orange', ja:'オレンジ', cat:'色', ex:'I like orange juice.', exja:'私はオレンジジュースが好きです。' },
+  { en:'pink',   ja:'ピンク',   cat:'色', ex:'She likes pink.',      exja:'彼女はピンクが好きです。' },
+  // スポーツ・趣味
+  { en:'soccer',   ja:'サッカー', cat:'スポーツ', ex:'I play soccer.',       exja:'私はサッカーをします。' },
+  { en:'tennis',   ja:'テニス',   cat:'スポーツ', ex:'She plays tennis.',    exja:'彼女はテニスをします。' },
+  { en:'baseball', ja:'野球',     cat:'スポーツ', ex:'I like baseball.',     exja:'私は野球が好きです。' },
+  { en:'swimming', ja:'水泳',     cat:'スポーツ', ex:'He likes swimming.',   exja:'彼は水泳が好きです。' },
+  { en:'music',    ja:'音楽',     cat:'スポーツ', ex:'I like music.',        exja:'私は音楽が好きです。' },
+  { en:'cooking',  ja:'料理',     cat:'スポーツ', ex:'She likes cooking.',   exja:'彼女は料理が好きです。' },
+  { en:'dancing',  ja:'ダンス',   cat:'スポーツ', ex:'I like dancing.',      exja:'私はダンスが好きです。' },
+  { en:'reading',  ja:'読書',     cat:'スポーツ', ex:'I like reading.',      exja:'私は読書が好きです。' },
+  // 学校
+  { en:'school',   ja:'学校',         cat:'学校', ex:'I go to school.',        exja:'私は学校に行きます。' },
+  { en:'teacher',  ja:'先生',         cat:'学校', ex:'My teacher is nice.',    exja:'私の先生は優しいです。' },
+  { en:'student',  ja:'生徒',         cat:'学校', ex:'I am a student.',        exja:'私は生徒です。' },
+  { en:'book',     ja:'本',           cat:'学校', ex:'I read a book.',         exja:'私は本を読みます。' },
+  { en:'pen',      ja:'ペン',         cat:'学校', ex:'Use this pen.',          exja:'このペンを使って。' },
+  { en:'desk',     ja:'机',           cat:'学校', ex:'Clean your desk.',       exja:'机を片付けて。' },
+  { en:'homework', ja:'宿題',         cat:'学校', ex:'I do my homework.',      exja:'私は宿題をします。' },
+  { en:'test',     ja:'テスト',       cat:'学校', ex:'I have a test today.',   exja:'今日テストがあります。' },
+  { en:'class',    ja:'授業・クラス', cat:'学校', ex:'I like my class.',       exja:'私は自分のクラスが好きです。' },
+  { en:'library',  ja:'図書館',       cat:'学校', ex:'I go to the library.',   exja:'私は図書館に行きます。' },
+  { en:'English',  ja:'英語',         cat:'学校', ex:'I study English.',       exja:'私は英語を勉強します。' },
+  { en:'Japanese', ja:'国語・日本語', cat:'学校', ex:'I like Japanese.',       exja:'私は国語が好きです。' },
+  { en:'math',     ja:'数学',         cat:'学校', ex:'Math is hard.',          exja:'数学は難しいです。' },
+  // 家族
+  { en:'father',  ja:'父',     cat:'家族', ex:'My father is tall.',  exja:'私の父は背が高いです。' },
+  { en:'mother',  ja:'母',     cat:'家族', ex:'My mother is kind.',  exja:'私の母は優しいです。' },
+  { en:'brother', ja:'兄・弟', cat:'家族', ex:'I have a brother.',   exja:'私には兄（弟）がいます。' },
+  { en:'sister',  ja:'姉・妹', cat:'家族', ex:'My sister is nice.',  exja:'私の姉（妹）は優しいです。' },
+  { en:'friend',  ja:'友達',   cat:'家族', ex:'She is my friend.',   exja:'彼女は私の友達です。' },
+  { en:'family',  ja:'家族',   cat:'家族', ex:'I love my family.',   exja:'私は家族が大好きです。' },
+  // 場所
+  { en:'park',     ja:'公園',     cat:'場所', ex:'I go to the park.',        exja:'私は公園に行きます。' },
+  { en:'shop',     ja:'お店',     cat:'場所', ex:'I go to the shop.',        exja:'私はお店に行きます。' },
+  { en:'hospital', ja:'病院',     cat:'場所', ex:'He is at hospital.',       exja:'彼は病院にいます。' },
+  { en:'station',  ja:'駅',       cat:'場所', ex:'Go to the station.',       exja:'駅に行って。' },
+  { en:'house',    ja:'家',       cat:'場所', ex:'This is my house.',        exja:'これが私の家です。' },
+  { en:'city',     ja:'都市・町', cat:'場所', ex:'I live in this city.',     exja:'私はこの町に住んでいます。' },
+  { en:'country',  ja:'国・田舎', cat:'場所', ex:'Japan is a nice country.', exja:'日本はいい国です。' },
+  { en:'Japan',    ja:'日本',     cat:'場所', ex:'I live in Japan.',         exja:'私は日本に住んでいます。' },
+  // 形容詞
+  { en:'big',       ja:'大きい',           cat:'形容詞', ex:'This is a big dog.',       exja:'これは大きな犬です。' },
+  { en:'small',     ja:'小さい',           cat:'形容詞', ex:'I have a small cat.',      exja:'私は小さな猫を飼っています。' },
+  { en:'fast',      ja:'速い',             cat:'形容詞', ex:'He runs fast.',            exja:'彼は速く走ります。' },
+  { en:'slow',      ja:'遅い',             cat:'形容詞', ex:'This train is slow.',      exja:'この電車は遅いです。' },
+  { en:'beautiful', ja:'美しい',           cat:'形容詞', ex:'The flower is beautiful.', exja:'その花は美しいです。' },
+  { en:'happy',     ja:'幸せな',           cat:'形容詞', ex:"I'm happy today.",         exja:'私は今日幸せです。' },
+  { en:'sad',       ja:'悲しい',           cat:'形容詞', ex:'She is sad.',              exja:'彼女は悲しいです。' },
+  { en:'tired',     ja:'疲れた',           cat:'形容詞', ex:"I'm tired.",               exja:'私は疲れています。' },
+  { en:'hungry',    ja:'お腹が空いた',     cat:'形容詞', ex:"I'm hungry.",              exja:'私はお腹が空いています。' },
+  { en:'hot',       ja:'暑い・熱い',       cat:'形容詞', ex:'It is hot today.',         exja:'今日は暑いです。' },
+  { en:'cold',      ja:'寒い・冷たい',     cat:'形容詞', ex:'This water is cold.',      exja:'この水は冷たいです。' },
+  { en:'new',       ja:'新しい',           cat:'形容詞', ex:'I have a new bag.',        exja:'私は新しいカバンを持っています。' },
+  { en:'old',       ja:'古い・年老いた',   cat:'形容詞', ex:'This book is old.',        exja:'この本は古いです。' },
+  { en:'nice',      ja:'すてきな',         cat:'形容詞', ex:'She is very nice.',        exja:'彼女はとても優しいです。' },
+  { en:'great',     ja:'すごい・素晴らしい', cat:'形容詞', ex:'You are great!',         exja:'あなたは素晴らしい！' },
+  // 動詞
+  { en:'like',   ja:'好きだ',           cat:'動詞', ex:'I like music.',        exja:'私は音楽が好きです。' },
+  { en:'have',   ja:'持っている',       cat:'動詞', ex:'I have a dog.',        exja:'私は犬を飼っています。' },
+  { en:'play',   ja:'遊ぶ・演奏する',   cat:'動詞', ex:'I play soccer.',       exja:'私はサッカーをします。' },
+  { en:'eat',    ja:'食べる',           cat:'動詞', ex:'I eat rice.',          exja:'私はご飯を食べます。' },
+  { en:'drink',  ja:'飲む',             cat:'動詞', ex:'I drink milk.',        exja:'私は牛乳を飲みます。' },
+  { en:'go',     ja:'行く',             cat:'動詞', ex:'I go to school.',      exja:'私は学校に行きます。' },
+  { en:'come',   ja:'来る',             cat:'動詞', ex:'Please come here.',    exja:'ここに来てください。' },
+  { en:'see',    ja:'見る・会う',       cat:'動詞', ex:'I see a bird.',        exja:'私は鳥を見ます。' },
+  { en:'know',   ja:'知っている',       cat:'動詞', ex:'I know him.',          exja:'私は彼を知っています。' },
+  { en:'study',  ja:'勉強する',         cat:'動詞', ex:'I study English.',     exja:'私は英語を勉強します。' },
+  { en:'live',   ja:'住んでいる',       cat:'動詞', ex:'I live in Japan.',     exja:'私は日本に住んでいます。' },
+  { en:'speak',  ja:'話す',             cat:'動詞', ex:'I speak Japanese.',    exja:'私は日本語を話します。' },
+  { en:'run',    ja:'走る',             cat:'動詞', ex:'I run every day.',     exja:'私は毎日走ります。' },
+  { en:'walk',   ja:'歩く',             cat:'動詞', ex:'I walk to school.',    exja:'私は歩いて学校に行きます。' },
+  { en:'watch',  ja:'見る（画面など）', cat:'動詞', ex:'I watch TV.',          exja:'私はテレビを見ます。' },
+  { en:'listen', ja:'聞く',             cat:'動詞', ex:'I listen to music.',   exja:'私は音楽を聴きます。' },
+  { en:'read',   ja:'読む',             cat:'動詞', ex:'I read a book.',       exja:'私は本を読みます。' },
+  { en:'write',  ja:'書く',             cat:'動詞', ex:'I write a letter.',    exja:'私は手紙を書きます。' },
+  { en:'make',   ja:'作る',             cat:'動詞', ex:'She makes cake.',      exja:'彼女はケーキを作ります。' },
+  { en:'want',   ja:'欲しい・したい',   cat:'動詞', ex:'I want a dog.',        exja:'私は犬が欲しいです。' },
+  { en:'think',  ja:'思う・考える',     cat:'動詞', ex:"I think it's nice.",   exja:'いいと思います。' },
+  { en:'help',   ja:'助ける',           cat:'動詞', ex:'Help me, please.',     exja:'助けてください。' },
+  { en:'use',    ja:'使う',             cat:'動詞', ex:'I use a pen.',         exja:'私はペンを使います。' },
+  { en:'get',    ja:'得る・なる',       cat:'動詞', ex:'I get up at seven.',   exja:'私は7時に起きます。' },
+  // 数字
+  { en:'one',     ja:'1',   cat:'数字', ex:'I have one dog.',      exja:'私は犬を1匹飼っています。' },
+  { en:'two',     ja:'2',   cat:'数字', ex:'I have two cats.',     exja:'私は猫を2匹飼っています。' },
+  { en:'three',   ja:'3',   cat:'数字', ex:'I eat three eggs.',    exja:'私は卵を3つ食べます。' },
+  { en:'four',    ja:'4',   cat:'数字', ex:'I have four books.',   exja:'私は本を4冊持っています。' },
+  { en:'five',    ja:'5',   cat:'数字', ex:'She has five friends.', exja:'彼女は友達が5人います。' },
+  { en:'six',     ja:'6',   cat:'数字', ex:"It is six o'clock.",   exja:'6時です。' },
+  { en:'seven',   ja:'7',   cat:'数字', ex:'I get up at seven.',   exja:'私は7時に起きます。' },
+  { en:'eight',   ja:'8',   cat:'数字', ex:"It is eight o'clock.", exja:'8時です。' },
+  { en:'nine',    ja:'9',   cat:'数字', ex:'I go to bed at nine.', exja:'私は9時に寝ます。' },
+  { en:'ten',     ja:'10',  cat:'数字', ex:'I have ten pencils.',  exja:'私は鉛筆を10本持っています。' },
+  { en:'hundred', ja:'100', cat:'数字', ex:'It costs 100 yen.',    exja:'100円です。' },
+  // 曜日
+  { en:'Monday',    ja:'月曜日', cat:'曜日', ex:'I have English on Monday.',  exja:'月曜日に英語があります。' },
+  { en:'Tuesday',   ja:'火曜日', cat:'曜日', ex:'We play soccer on Tuesday.', exja:'火曜日にサッカーをします。' },
+  { en:'Wednesday', ja:'水曜日', cat:'曜日', ex:'I study on Wednesday.',      exja:'水曜日に勉強します。' },
+  { en:'Thursday',  ja:'木曜日', cat:'曜日', ex:'I read on Thursday.',        exja:'木曜日に読書します。' },
+  { en:'Friday',    ja:'金曜日', cat:'曜日', ex:'I like Friday.',             exja:'私は金曜日が好きです。' },
+  { en:'Saturday',  ja:'土曜日', cat:'曜日', ex:'I play tennis on Saturday.', exja:'土曜日にテニスをします。' },
+  { en:'Sunday',    ja:'日曜日', cat:'曜日', ex:'I rest on Sunday.',          exja:'日曜日は休みます。' },
+  // 月
+  { en:'January',   ja:'1月',  cat:'月', ex:'My birthday is in January.', exja:'私の誕生日は1月です。' },
+  { en:'February',  ja:'2月',  cat:'月', ex:'It is cold in February.',    exja:'2月は寒いです。' },
+  { en:'March',     ja:'3月',  cat:'月', ex:'Spring starts in March.',    exja:'3月に春が来ます。' },
+  { en:'April',     ja:'4月',  cat:'月', ex:'School starts in April.',    exja:'学校は4月に始まります。' },
+  { en:'May',       ja:'5月',  cat:'月', ex:'It is warm in May.',         exja:'5月は暖かいです。' },
+  { en:'June',      ja:'6月',  cat:'月', ex:'It rains in June.',          exja:'6月は雨が降ります。' },
+  { en:'July',      ja:'7月',  cat:'月', ex:'It is hot in July.',         exja:'7月は暑いです。' },
+  { en:'August',    ja:'8月',  cat:'月', ex:'I swim in August.',          exja:'8月に泳ぎます。' },
+  { en:'September', ja:'9月',  cat:'月', ex:'School starts in September.',exja:'9月に新学期です。' },
+  { en:'October',   ja:'10月', cat:'月', ex:'It is cool in October.',     exja:'10月は涼しいです。' },
+  { en:'November',  ja:'11月', cat:'月', ex:'It is cold in November.',    exja:'11月は寒いです。' },
+  { en:'December',  ja:'12月', cat:'月', ex:'Christmas is in December.',  exja:'クリスマスは12月です。' },
 ];
 
 const QUIZZES = [
@@ -916,6 +936,26 @@ const QUIZZES = [
   { q:"How old ___ you?",             c:['do','are','is','am'],                  a:1, exp:'How old are you? = 何歳ですか？',                  cat:'会話' },
   { q:"What time ___ it?",            c:['do','are','is','am'],                  a:2, exp:'What time is it? = 何時ですか？',                  cat:'会話' },
   { q:"___ is your name?",            c:['Who','What','Where','How'],            a:1, exp:'名前を聞くときは What is your name?',              cat:'会話' },
+  // 代名詞
+  { q:'___ name is Taro. (私の)',       c:['My','Your','His','Her'],             a:0, exp:'「私の」は My です',                                cat:'代名詞' },
+  { q:'___ name is Hanako. (彼女の)',   c:['My','Your','His','Her'],             a:3, exp:'「彼女の」は Her です',                              cat:'代名詞' },
+  { q:'___ name is Ken. (彼の)',        c:['My','Your','His','Her'],             a:2, exp:'「彼の」は His です',                               cat:'代名詞' },
+  { q:'What is ___ name? (あなたの)',   c:['my','your','his','her'],             a:1, exp:'「あなたの」は your です',                          cat:'代名詞' },
+  { q:'I like ___. (彼女を)',           c:['she','her','he','him'],              a:1, exp:'「彼女を」は her（目的格）です',                    cat:'代名詞' },
+  { q:'I know ___. (彼を)',             c:['he','his','him','her'],              a:2, exp:'「彼を」は him（目的格）です',                      cat:'代名詞' },
+  // 疑問詞
+  { q:'___ is this? (何ですか)',         c:['What','Who','Where','When'],        a:0, exp:'「何ですか」は What を使います',                    cat:'疑問詞' },
+  { q:'___ is she? (彼女はだれ)',        c:['What','Who','Where','When'],        a:1, exp:'「だれですか」は Who を使います',                   cat:'疑問詞' },
+  { q:'___ is the station? (どこ)',      c:['What','Who','Where','When'],        a:2, exp:'「どこですか」は Where を使います',                 cat:'疑問詞' },
+  { q:'___ is your birthday? (いつ)',    c:['What','Who','When','Where'],        a:2, exp:'「いつですか」は When を使います',                  cat:'疑問詞' },
+  { q:'___ many apples do you have?',   c:['What','How','Who','Where'],         a:1, exp:'「いくつ」は How many を使います',                  cat:'疑問詞' },
+  { q:'___ many students are there?',   c:['What','How','Who','When'],          a:1, exp:'数を尋ねるときは How many + 複数名詞',               cat:'疑問詞' },
+  // 命令文
+  { q:'「本を開けなさい」→ ___ your book.',   c:['Open','Opens','Opening','Opened'], a:0, exp:'命令文は動詞の原形で始めます',                    cat:'命令文' },
+  { q:'「走りなさい」→ ___ fast!',            c:['Run','Runs','Running','To run'],   a:0, exp:'命令文: 主語なしで動詞の原形から始めます',        cat:'命令文' },
+  { q:'「静かにしなさい」→ ___ quiet.',        c:['Be','Is','Am','Are'],              a:0, exp:'be動詞の命令文は Be で始めます',                  cat:'命令文' },
+  { q:'「走ってはいけない」→ ___ run.',        c:["Don't","Doesn't","Not","No"],      a:0, exp:"否定の命令文は Don't + 動詞の原形",               cat:'命令文' },
+  { q:'「ここで話さないで」→ ___ talk here.',  c:["Don't","Doesn't","Not","No"],      a:0, exp:"Don't + 動詞の原形 = 〜してはいけない",           cat:'命令文' },
 ];
 
 // ============================================================
@@ -1037,6 +1077,8 @@ function loadWord() {
   document.getElementById('vocab-cat').textContent = w.cat;
   document.getElementById('vocab-cat2').textContent = w.cat;
   document.getElementById('vocab-cat-label').textContent = w.cat;
+  document.getElementById('vocab-ex-en').textContent = w.ex || '';
+  document.getElementById('vocab-ex-ja').textContent = w.exja || '';
   document.getElementById('vocab-btns').style.display = 'none';
 }
 
