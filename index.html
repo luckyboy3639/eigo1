@@ -95,6 +95,8 @@ body {
   background: linear-gradient(135deg, #16a34a 0%, #22c55e 80%);
   padding: 16px; display: flex; align-items: center; gap: 12px; color: #fff;
   margin-bottom: 16px;
+  position: sticky; top: 0; z-index: 100;
+  max-width: 480px;
 }
 .back-btn {
   background: rgba(255,255,255,0.2); border: none; color: #fff;
@@ -428,6 +430,38 @@ body {
 }
 .mc-dot { width: 10px; height: 10px; border-radius: 50%; }
 
+/* ===== GRAMMAR LIST ===== */
+.gram-lv-title {
+  font-size: 14px; font-weight: 900; padding: 8px 12px; border-radius: 10px;
+  margin: 18px 0 8px; letter-spacing: 0.4px;
+}
+.gram-lv1 { background: #dcfce7; color: #166534; }
+.gram-lv2 { background: #dbeafe; color: #1e40af; }
+.gram-lv3 { background: #fee2e2; color: #991b1b; }
+.gram-card {
+  background: var(--surface); border-radius: 12px; margin-bottom: 10px;
+  border: 1px solid var(--border); overflow: hidden;
+}
+.gram-card-head {
+  background: var(--mga-light); padding: 10px 14px;
+  font-size: 14px; font-weight: 900; color: var(--mga-green);
+  display: flex; align-items: center; gap: 6px;
+}
+.gram-card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.gram-point {
+  font-size: 13px; color: var(--text); line-height: 1.6;
+  background: #f8fffe; border-left: 3px solid var(--mga-green2);
+  padding: 6px 10px; border-radius: 0 8px 8px 0;
+}
+.gram-point strong { color: var(--mga-green); }
+.gram-ex {
+  font-size: 12px; color: var(--text-dim); background: #f0fdf4;
+  border-radius: 8px; padding: 6px 10px; line-height: 1.7;
+}
+.gram-ex span { display: block; }
+.gram-ex .en { font-weight: 700; color: var(--text); }
+.gram-ex .ja { color: var(--text-dim); }
+
 /* ===== VOCAB LIST ===== */
 .vocab-list-section { margin-bottom: 18px; }
 .vocab-list-cat-title {
@@ -555,7 +589,13 @@ body {
         <div class="menu-card-top-bar bar-blue"></div>
         <span class="menu-card-icon">🎯</span>
         <span class="menu-card-label">文法クイズ</span>
-        <span class="menu-card-sub">+10〜15 XP / 問</span>
+        <span class="menu-card-sub">+5 XP / 問</span>
+      </button>
+      <button class="menu-card" onclick="showGrammarList()">
+        <div class="menu-card-top-bar bar-blue"></div>
+        <span class="menu-card-icon">📝</span>
+        <span class="menu-card-label">文法一覧</span>
+        <span class="menu-card-sub">要点＋例文で確認</span>
       </button>
       <button class="menu-card menu-card-wide" onclick="showAlbum()" id="album-menu-btn">
         <div class="menu-card-top-bar bar-yellow"></div>
@@ -617,6 +657,15 @@ body {
     <div class="vocab-list-count" id="vlist-count"></div>
     <div id="vocab-list-body"></div>
   </div>
+</div>
+
+<!-- ===== GRAMMAR LIST ===== -->
+<div id="screen-grammar-list" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="page-title">📝 文法一覧</span>
+  </div>
+  <div class="screen-body" id="grammar-list-body"></div>
 </div>
 
 <!-- ===== QUIZ DIFFICULTY ===== -->
@@ -1431,7 +1480,7 @@ function startQuiz(lv) {
     pool = QUIZZES.filter(q => cats.includes(q.cat));
     if (pool.length === 0) pool = [...QUIZZES];
   }
-  const xpPer = lv === 3 ? 15 : lv === 2 ? 12 : 10;
+  const xpPer = 5;
   const qs = pool.sort(() => Math.random()-0.5).slice(0, 10);
   qc = { qs, idx:0, ok:0, ng:0, xp:0, xpPer, answered:false };
   document.getElementById('quiz-xp').textContent = '+0 XP';
@@ -1591,6 +1640,285 @@ function confetti() {
     c.appendChild(p);
   }
   setTimeout(() => { c.innerHTML = ''; }, 3500);
+}
+
+// ============================================================
+// GRAMMAR LIST
+// ============================================================
+const GRAMMAR_DATA = [
+  {
+    lv: 1, lvLabel: '⭐ やさしい（まずここから！）', lvClass: 'gram-lv1',
+    items: [
+      {
+        title: 'be動詞（am / is / are）',
+        points: [
+          'I → <strong>am</strong>　　You・We・They → <strong>are</strong>　　He・She・It → <strong>is</strong>',
+          '「〜です・〜にいます」を表す。主語によって形が変わる！',
+        ],
+        exs: [
+          { en: 'I am a student.', ja: '私は生徒です。' },
+          { en: 'She is my friend.', ja: '彼女は私の友達です。' },
+          { en: 'We are classmates.', ja: '私たちはクラスメートです。' },
+        ],
+      },
+      {
+        title: '一般動詞（現在形）',
+        points: [
+          'I / You / We / They → <strong>動詞の原形</strong>をそのまま使う',
+          '「〜する」という動作を表す。be動詞とは別もの！',
+        ],
+        exs: [
+          { en: 'I play soccer.', ja: '私はサッカーをします。' },
+          { en: 'We like music.', ja: '私たちは音楽が好きです。' },
+          { en: 'You have a dog.', ja: 'あなたは犬を飼っています。' },
+        ],
+      },
+      {
+        title: 'This / That / These / Those',
+        points: [
+          '近いもの1つ → <strong>This</strong>（これ）　遠いもの1つ → <strong>That</strong>（あれ）',
+          '近いもの複数 → <strong>These</strong>（これら）　遠いもの複数 → <strong>Those</strong>（あれら）',
+        ],
+        exs: [
+          { en: 'This is my bag.', ja: 'これは私のかばんです。' },
+          { en: 'Those are big dogs.', ja: 'あれらは大きな犬です。' },
+        ],
+      },
+      {
+        title: 'There is / There are',
+        points: [
+          '「〜があります・います」は <strong>There is</strong>（単数）/ <strong>There are</strong>（複数）',
+          '主語は There の後ろに来る！',
+        ],
+        exs: [
+          { en: 'There is a cat on the desk.', ja: '机の上に猫が1匹います。' },
+          { en: 'There are three books here.', ja: 'ここに本が3冊あります。' },
+        ],
+      },
+    ],
+  },
+  {
+    lv: 2, lvLabel: '⭐⭐ ふつう', lvClass: 'gram-lv2',
+    items: [
+      {
+        title: '疑問文（be動詞）',
+        points: [
+          'be動詞を主語の前に出すだけ！',
+          '<strong>Are you</strong> 〜? / <strong>Is she</strong> 〜? / <strong>Are they</strong> 〜?',
+        ],
+        exs: [
+          { en: 'Are you a student?', ja: 'あなたは生徒ですか？' },
+          { en: 'Is he your brother?', ja: '彼はあなたのお兄さんですか？' },
+        ],
+      },
+      {
+        title: '疑問文（一般動詞）',
+        points: [
+          'I/You/We/They → 文の前に <strong>Do</strong> をつける',
+          'He/She/It → 文の前に <strong>Does</strong> をつける（動詞は原形に戻る）',
+        ],
+        exs: [
+          { en: 'Do you like soccer?', ja: 'あなたはサッカーが好きですか？' },
+          { en: 'Does she play the piano?', ja: '彼女はピアノを弾きますか？' },
+        ],
+      },
+      {
+        title: '否定文',
+        points: [
+          'be動詞 → be動詞のあとに <strong>not</strong>（isn\'t / aren\'t）',
+          '一般動詞 → <strong>don\'t</strong> / <strong>doesn\'t</strong>（He/She/Itのとき）+ 動詞の原形',
+        ],
+        exs: [
+          { en: "I don't like carrots.", ja: '私はにんじんが好きではありません。' },
+          { en: "She doesn't play tennis.", ja: '彼女はテニスをしません。' },
+          { en: "He isn't at school.", ja: '彼は学校にいません。' },
+        ],
+      },
+      {
+        title: '複数形',
+        points: [
+          '普通の名詞 → <strong>+s</strong>（dog → dogs）',
+          's / x / sh / ch 終わり → <strong>+es</strong>（box → boxes）',
+          '子音+y 終わり → <strong>y→ies</strong>（city → cities）',
+          '不規則変化 → <strong>child→children</strong>、man→men、foot→feet',
+        ],
+        exs: [
+          { en: 'I have two dogs.', ja: '私は犬を2匹飼っています。' },
+          { en: 'There are three boxes.', ja: '箱が3つあります。' },
+        ],
+      },
+      {
+        title: 'can（〜できる）',
+        points: [
+          '<strong>can + 動詞の原形</strong>。主語が誰でも形は変わらない！',
+          '疑問文 → <strong>Can + 主語 + 動詞の原形</strong>?',
+          '否定文 → <strong>can\'t（cannot）+ 動詞の原形</strong>',
+        ],
+        exs: [
+          { en: 'I can swim.', ja: '私は泳げます。' },
+          { en: 'Can you speak English?', ja: 'あなたは英語を話せますか？' },
+          { en: "He can't run fast.", ja: '彼は速く走れません。' },
+        ],
+      },
+      {
+        title: '代名詞',
+        points: [
+          '主格（〜は）: I / you / he / she / we / they',
+          '所有格（〜の）: <strong>my</strong> / your / <strong>his</strong> / <strong>her</strong> / our / their',
+          '目的格（〜を）: me / you / <strong>him</strong> / <strong>her</strong> / us / them',
+        ],
+        exs: [
+          { en: 'My name is Taro.', ja: '私の名前はタロウです。' },
+          { en: 'I know her.', ja: '私は彼女を知っています。' },
+        ],
+      },
+      {
+        title: '疑問詞',
+        points: [
+          '<strong>What</strong>（何）/ <strong>Who</strong>（だれ）/ <strong>Where</strong>（どこ）/ <strong>When</strong>（いつ）',
+          '<strong>How many</strong>（いくつ・何人）数えられるもの　/ <strong>How much</strong>（いくら・どのくらい）',
+          '疑問詞は文の一番最初に置く！',
+        ],
+        exs: [
+          { en: 'What is this?', ja: 'これは何ですか？' },
+          { en: 'Where is the station?', ja: '駅はどこですか？' },
+          { en: 'How many students are there?', ja: '生徒は何人いますか？' },
+        ],
+      },
+      {
+        title: '命令文',
+        points: [
+          '主語なし・<strong>動詞の原形</strong>で始める → 「〜しなさい」',
+          'be動詞の命令文 → <strong>Be</strong> quiet. など',
+          '否定の命令文 → <strong>Don\'t + 動詞の原形</strong>（〜してはいけない）',
+        ],
+        exs: [
+          { en: 'Open your book.', ja: '本を開けなさい。' },
+          { en: 'Be quiet, please.', ja: '静かにしてください。' },
+          { en: "Don't run here.", ja: 'ここで走ってはいけません。' },
+        ],
+      },
+    ],
+  },
+  {
+    lv: 3, lvLabel: '⭐⭐⭐ むずかしい', lvClass: 'gram-lv3',
+    items: [
+      {
+        title: '三単現（He / She / It のとき）',
+        points: [
+          'He / She / It が主語の一般動詞 → 動詞に <strong>s / es / ies</strong> をつける',
+          'play → plays　go → goes　study → studies',
+          '疑問文・否定文は <strong>Does / doesn\'t</strong> を使い、動詞は原形に戻る',
+        ],
+        exs: [
+          { en: 'She plays the piano.', ja: '彼女はピアノを弾きます。' },
+          { en: 'He goes to school by bus.', ja: '彼はバスで学校に行きます。' },
+        ],
+      },
+      {
+        title: '現在進行形（今まさに〜している）',
+        points: [
+          '<strong>be動詞 + 動詞ing</strong> の形',
+          'I am / She is / We are + 動詞ing',
+          '動詞ing の作り方：普通は+ing、e終わりはeを取って+ing（make→making）、短母音+子音は子音を重ねて+ing（run→running）',
+        ],
+        exs: [
+          { en: 'I am studying now.', ja: '私は今勉強しています。' },
+          { en: 'She is running in the park.', ja: '彼女は公園で走っています。' },
+          { en: 'They are playing soccer.', ja: '彼らはサッカーをしています。' },
+        ],
+      },
+      {
+        title: '前置詞（in / on / at / by / under）',
+        points: [
+          '時刻・場所の点 → <strong>at</strong>（at 7, at school）',
+          '月・年・朝夕 → <strong>in</strong>（in March, in the morning）',
+          '曜日・日付・表面 → <strong>on</strong>（on Monday, on the desk）',
+          '乗り物の手段 → <strong>by</strong>（by bus, by bike）',
+          '〜の下 → <strong>under</strong>（under the table）',
+        ],
+        exs: [
+          { en: 'I get up at seven.', ja: '私は7時に起きます。' },
+          { en: 'We play soccer on Sundays.', ja: '私たちは日曜日にサッカーをします。' },
+          { en: 'I go to school by bike.', ja: '私は自転車で学校に行きます。' },
+        ],
+      },
+      {
+        title: '形容詞の使い方',
+        points: [
+          '名詞の前に置く → a <strong>nice</strong> girl / a <strong>big</strong> dog',
+          'be動詞のあとに置く → She is <strong>kind</strong>.',
+          '副詞（nicely など）と混同しない！名詞を説明するのが形容詞',
+        ],
+        exs: [
+          { en: 'This is a beautiful flower.', ja: 'これは美しい花です。' },
+          { en: 'The soup tastes good.', ja: 'そのスープはおいしい。' },
+        ],
+      },
+      {
+        title: 'How much / How many / How old / How long',
+        points: [
+          '<strong>How many</strong> + 複数名詞 → 数えられるものの数',
+          '<strong>How much</strong> → 値段・量（数えられないもの）',
+          '<strong>How old</strong> → 年齢　<strong>How long</strong> → 長さ・時間の長さ',
+        ],
+        exs: [
+          { en: 'How many apples do you have?', ja: 'りんごをいくつ持っていますか？' },
+          { en: 'How much is this bag?', ja: 'このかばんはいくらですか？' },
+          { en: 'How old are you?', ja: 'あなたは何歳ですか？' },
+        ],
+      },
+      {
+        title: '会話表現（英検5級頻出）',
+        points: [
+          'Thank you. → <strong>You\'re welcome.</strong>（どういたしまして）',
+          'I\'m sorry. → <strong>That\'s OK.</strong>（大丈夫ですよ）',
+          'Nice to meet you. → <strong>Nice to meet you, too.</strong>',
+          'How are you? → <strong>I\'m fine, thank you.</strong>',
+        ],
+        exs: [
+          { en: "A: Thank you!  B: You're welcome.", ja: 'A：ありがとう！　B：どういたしまして。' },
+          { en: "A: I'm sorry.  B: That's OK.", ja: 'A：ごめんなさい。　B：大丈夫ですよ。' },
+        ],
+      },
+    ],
+  },
+];
+
+function showGrammarList() {
+  const body = document.getElementById('grammar-list-body');
+  body.innerHTML = '';
+  GRAMMAR_DATA.forEach(lv => {
+    const lvEl = document.createElement('div');
+    lvEl.className = 'gram-lv-title ' + lv.lvClass;
+    lvEl.textContent = lv.lvLabel;
+    body.appendChild(lvEl);
+    lv.items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'gram-card';
+      const head = document.createElement('div');
+      head.className = 'gram-card-head';
+      head.innerHTML = '📌 ' + item.title;
+      const bd = document.createElement('div');
+      bd.className = 'gram-card-body';
+      item.points.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'gram-point';
+        el.innerHTML = p;
+        bd.appendChild(el);
+      });
+      item.exs.forEach(ex => {
+        const el = document.createElement('div');
+        el.className = 'gram-ex';
+        el.innerHTML = `<span class="en">${ex.en}</span><span class="ja">${ex.ja}</span>`;
+        bd.appendChild(el);
+      });
+      card.appendChild(head);
+      card.appendChild(bd);
+      body.appendChild(card);
+    });
+  });
+  show('screen-grammar-list');
 }
 
 // ============================================================
